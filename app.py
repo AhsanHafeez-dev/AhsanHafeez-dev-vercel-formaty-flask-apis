@@ -8,13 +8,15 @@ def get_template():
     data = request.get_json()
     template_name = data.get('templateName')
     title = data.get('title')
-    
+    authorsList = data.get('authors')
+    content = data.get('content')  
+     
 
     if template_name:
         try:
             module = importlib.import_module(f"Templates.{template_name}.app")
             template_func = getattr(module, template_name)
-            response = template_func(title)
+            response = template_func(title,authorsList , content)
             return jsonify({"message": response}), 200
         
         except (ModuleNotFoundError, AttributeError) as e:
