@@ -4,7 +4,11 @@ from pylatex.utils import NoEscape , italic, bold , NoEscape
 from pylatex import Document, Section, Subsection, Subsubsection, Command, Itemize, Enumerate, Table, Tabular
 import json
 import re
-
+from werkzeug.utils import secure_filename
+import firebase_admin
+from firebase_admin import credentials,storage
+from dotenv import load_dotenv
+import os 
 
 def demo():
     return "hello this is working"
@@ -140,6 +144,7 @@ def add_raw_preamble(doc, raw_preamble_list):
 
 
 def fill_document(doc, data):
+    input("in fill document")
     for section in data["sections"]:
         with doc.create(Section(section["title"])):
             doc.append(parse_content(section["content"]))           
@@ -160,15 +165,40 @@ def fill_document(doc, data):
                             # if "tables" in subsubsection:
                             #     add_tables(doc, subsubsection["tables"])
 
+    input("going back from fill form")
 def generate_author_block(authors):
+
     author_block = r'\author{'
     for i, author in enumerate(authors):
-        author_block += r'\IEEEauthorblockN{' + str(i+1) + '. ' + author['name'] + r'}' + '\n'
+        author_block += r'\IEEEauthorblockN{' + str(i+1) + '. ' + author['userName'] + r'}' + '\n'
         author_block += r'\IEEEauthorblockA{\textit{' + author['department'] + r'} \\' + '\n'
-        author_block += r'\textit{' + author['organization'] + r'}\\' + '\n'
-        author_block += author['city_country'] + r' \\' + '\n'
+        author_block += r'\textit{' + author['university'] + r'}\\' + '\n'
+        author_block += author['city'] + r' \\' + '\n'
         author_block += author['email'] + r'}'
         if i < len(authors) - 1:
             author_block += r'\and' + '\n'
     author_block += r'}'
     return NoEscape(author_block)
+
+def download_images_from_firebase(image_list,folder_name="temporary"):
+    
+    load_dotenv()
+    cred=credentials.certficate(os.get("json_file"))
+    firebase_admin.initialize_app(cred,
+                                  {
+                                      'storageBucket':os.get("bucket")
+                                  }
+                                  )
+    try:
+        bucket=storage.bucket()
+        i=1
+        for image in image_list:
+            blob=bucket.blob(image )
+            full_path=os.path.join(folder_name,"img_"+str(i))
+            blob.download_to_file_name(full_path)
+            i+=1
+    except Exception as e:
+        print(e)
+    return True
+
+

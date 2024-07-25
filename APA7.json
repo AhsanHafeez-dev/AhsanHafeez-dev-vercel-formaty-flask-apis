@@ -1,0 +1,52 @@
+{
+    "templateName":"APA7" ,   
+    "documentclass": "apa7",
+    "document_options": [
+        "stu",
+        "12pt",
+        "floatsintext"
+    ],
+    "fontenc": null,
+    "inputenc": null,
+    "lmodern": false,
+    "textcomp": false,
+    
+    "rawPreamables":[  "r'\\DeclareLanguageMapping{american}{american-apa}'"] ,
+    
+
+    "packages":[
+        {
+            "name": "babel",
+            "options": [
+                "american"
+            ]
+        },
+        {
+            "name": "fontenc",
+            "options": [
+                "T1"
+            ]
+        },
+        {
+            "name": "csquotes",
+            "options": []
+        },
+        {
+            "name": "biblatex",
+            "options": [
+                "style=apa",
+                "sortcites=true",
+                "sorting=nyt",
+                "backend=biber"
+            ]
+        },
+        {
+            "name": "mathptmx",
+            "options": []
+        }
+    ]
+
+
+
+}
+
