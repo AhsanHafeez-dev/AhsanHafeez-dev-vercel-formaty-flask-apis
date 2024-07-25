@@ -163,10 +163,10 @@ def fill_document(doc, data):
 def generate_author_block(authors):
     author_block = r'\author{'
     for i, author in enumerate(authors):
-        author_block += r'\IEEEauthorblockN{' + str(i+1) + '. ' + author['name'] + r'}' + '\n'
+        author_block += r'\IEEEauthorblockN{' + str(i+1) + '. ' + author['userName'] + r'}' + '\n'
         author_block += r'\IEEEauthorblockA{\textit{' + author['department'] + r'} \\' + '\n'
-        author_block += r'\textit{' + author['organization'] + r'}\\' + '\n'
-        author_block += author['city_country'] + r' \\' + '\n'
+        author_block += r'\textit{' + author['university'] + r'}\\' + '\n'
+        author_block += author['city'] + r' \\' + '\n'
         author_block += author['email'] + r'}'
         if i < len(authors) - 1:
             author_block += r'\and' + '\n'

@@ -1,0 +1,50 @@
+{
+    "templateName": "IEEEa",
+    "documentclass": "IEEEtran",
+    "document_options": [
+        "stu",
+        "12pt",
+        "floatsintext"
+    ],
+    "fontenc": null,
+    "inputenc": null,
+    "lmodern": false,
+    "textcomp": false,
+    "rawPreamables": [
+        "r'\\IEEEoverridecommandlockouts'"
+    ],
+    "packages": [
+        {
+            "name": "cite",
+            "options": []
+        },
+        {
+            "name": "amsmath",
+            "options": []
+        },
+        {
+            "name": "amssymb",
+            "options": []
+        },
+        {
+            "name": "amsfonts",
+            "options": []
+        },
+        {
+            "name": "algorithmic",
+            "options": []
+        },
+        {
+            "name": "graphicx",
+            "options": []
+        },
+        {
+            "name": "textcomp",
+            "options": []
+        },
+        {
+            "name": "xcolor",
+            "options": []
+        }
+    ]
+}
