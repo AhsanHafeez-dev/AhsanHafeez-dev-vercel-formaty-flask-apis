@@ -37,7 +37,7 @@ def get_all_project_info(project_id):
     
         
     all_info=db.projects.find_one({"_id":project_id})
-    print("all_info")
+    # print("all_info")
     all_info.pop("_id")
     return all_info
 
@@ -134,7 +134,7 @@ def get_citation_title(citation_id):
         return "citation not found"
     
 def get_all_citations(citation_id_list):
-    print("citation list")
+    # print("citation list")
     # input(citation_id_list)
     citations=[]
     for citation_id in citation_id_list:

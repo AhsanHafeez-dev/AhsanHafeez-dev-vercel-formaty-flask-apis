@@ -60,8 +60,14 @@ def handle_tables(text):
     
 
 
-def parse_content(text):
-    text = handle_tables(text)
+def parse_content(doc,text,templateName):
+    # text = handle_tables(text)
+    # input("before")
+    # input(text)
+    text=add_tables(doc,text,templateName)
+    # input("after")
+    # input(text)
+
     text = text.replace("<b>", "\\textbf{").replace("</b>", "}")
     text = text.replace("<i>", "\\textit{").replace("</i>", "}")
 
@@ -95,13 +101,13 @@ def parse_content(text):
 
 
     # Handle images
-    print(text)
+    # print(text)
     text = re.sub(r"<img\s+src=['\"](.*?)['\"]\s+alt=['\"](.*?)['\"]\s*/?>", 
                   replace_img_tag, text)
     # print("images")
     # print(re.findall(r"\\begin{figure}",txt,re.DOTALL))
-    print(text)
-    input("match texts")
+    # print(text)
+    # input("match texts")
 
 
     
@@ -125,7 +131,7 @@ def parse_content(text):
 
 
 
-def add_tables(doc,tables,templateName):
+def add_tables(doc,html_content,templateName):
     """
     docstring for function
     Input   HTML_Table(Type : str) , doc(LaTex Document)
@@ -134,25 +140,31 @@ def add_tables(doc,tables,templateName):
     Assumption : content or table data is plain text or number not a mathematical function or anything elinese
     Table does not include caption or centering
     """    
+
+    tables=re.findall("<table.*>.*?</table>",html_content,re.DOTALL)
     
     for table in tables:
-
-        table=re.sub(r"\n","",table)
+        raw_table=table
+        raw_table=re.sub(r"\n","",raw_table)
 
         if "APA" in templateName:
-            tabular_defination=get_tabular_defination_APA(table)
+            tabular_defination=get_tabular_defination_APA(raw_table)
         else:
-            tabular_defination,max_columns = get_tabular_defination(table)                  
+            tabular_defination,max_columns = get_tabular_defination(raw_table)                  
 
         patterns = get_pattern_list()                                                              #pattern to be matches                                                                                
         replace_with_list = get_replace_with_list(tabular_defination)                             # replace with to go from html to latex
         
         for i in range(len(patterns)):  
-            table = re.sub(patterns[i], replace_with_list[i], table)           # replace every html pattern with latex syntax
+            raw_table = re.sub(patterns[i], replace_with_list[i], raw_table)           # replace every html pattern with latex syntax
 
-        table=handle_multi_row(table,max_columns)        
-        # doc.append(Command(NewLine))
-        doc.append(NoEscape(table))
+        raw_table=handle_multi_row(raw_table,max_columns)        
+        # input(table==tables[0])   # giving output true
+        # input(raw_table)
+        html_content=html_content.replace(table,raw_table)
+        # but still html
+        # input(html_content)
+    return html_content
 
 
 
@@ -208,25 +220,22 @@ def fill_document(doc, data,templateName):
     for section in data["sections"]:
         with doc.create(Section(section["title"])):
             # print("Sections")
-            doc.append(parse_content(section["content"]))           
-            if "<table>" in section["content"]:
-                add_tables(doc, [section["content"]],templateName )
+            
+            content=parse_content(doc,section["content"],templateName)
+            doc.append(content)
+            if "</table>" in section["content"]:
+                # input("founf section table")
+                add_tables(doc, content,templateName )
 
             for subsection in section.get("subSections", []):
                 with doc.create(Subsection(subsection["title"])):
-                    doc.append(parse_content(subsection["content"]))
+                    doc.append(parse_content(doc,subsection["content"],templateName))
 
-
-                    if "<table>" in subsection:
-                        # input("found subsection tables")
-                        add_tables(doc, [subsection["content"]],templateName)
 
                     for subsubsection in subsection.get("subSubSections", []):
                         with doc.create(Subsubsection(subsubsection["title"])):
-                            doc.append(parse_content(subsubsection["content"]))
-                            if "<table>" in subsubsection:
-                                # input("found subsection tables")
-                                add_tables(doc, [subsubsection["content"]],templateName)
+                            doc.append(parse_content(doc,subsubsection["content"],templateName))
+                
     
     
 
@@ -300,7 +309,7 @@ def get_pattern_list():
             r"<cite>(.*?)</cite>"                   ,                           #7  citations    
             r"&\s*-1"                               ,                           #8  extra & -1 sign at end of each row
             r"</table>"                             ,                           #9  end of table tage
-            r"<table .+?>"                                                      #10 start table tag
+            r"<table.*?>"                                                      #10 start table tag
         ]
 
                                                                                 # replace with to go from html to latex
@@ -342,7 +351,7 @@ def get_tabular_defination_APA(table):
                                                                                 # setting latex syntax regading how many columns will be in column
         tabular_defination = ''.join('c' * max_columns)
         tabular_defination = f"{tabular_defination}"
-        print("APA7 : "+tabular_defination)
+        # print("APA7 : "+tabular_defination)
         return [tabular_defination,max_columns]
 
 

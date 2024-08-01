@@ -135,6 +135,6 @@ def get_template():
         return jsonify({"error": "templateName not provided"}), 400
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
 
 #

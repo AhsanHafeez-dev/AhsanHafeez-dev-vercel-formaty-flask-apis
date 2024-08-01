@@ -11,7 +11,8 @@ raw_preamble_list = [
 
 
 def IEEE(project_id):    
-    doc_config,packages =  db.get_template_info("IEEE")
+    templateName="IEEE"
+    doc_config,packages =  db.get_template_info(templateName)
     doc = Document(**doc_config)
     add_raw_preamble(doc, raw_preamble_list)
     add_packages(doc, packages)    
@@ -27,13 +28,13 @@ def IEEE(project_id):
     author_block = generate_author_block(authorsList)    
     doc.append(author_block)    
     doc.append(NoEscape(r'\maketitle'))    
-    fill_document(doc, content)
+    fill_document(doc, content,templateName)
     
     doc.append(NoEscape(r'\bibliographystyle{plain}'))                                                        # adding biblograhy style
     doc.append(NoEscape(r'\bibliography{references}'))                                                        # file name for biblography output.bib
 
     doc.generate_tex()
-    input("going for pdf")
+    print("going for pdf")
     try:
       doc.generate_pdf(os.path.join("temp","IEEE"), clean_tex=False)
       
