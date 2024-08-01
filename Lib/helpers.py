@@ -377,3 +377,6 @@ def replace_img_tag(match):
     \\caption{{{alt}}}
     \\label{{fig:{image_name}}}
     \\end{{{figure}}}'''    
+
+
+#end of helper
