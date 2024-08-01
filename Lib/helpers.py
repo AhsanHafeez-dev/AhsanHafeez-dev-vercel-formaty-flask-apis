@@ -209,24 +209,24 @@ def fill_document(doc, data,templateName):
         with doc.create(Section(section["title"])):
             # print("Sections")
             doc.append(parse_content(section["content"]))           
-            if "tables" in section:
-                add_tables(doc, [section["tables"]],templateName )
+            if "<table>" in section["content"]:
+                add_tables(doc, [section["content"]],templateName )
 
             for subsection in section.get("subSections", []):
                 with doc.create(Subsection(subsection["title"])):
                     doc.append(parse_content(subsection["content"]))
 
 
-                    if "tables" in subsection:
+                    if "<table>" in subsection:
                         # input("found subsection tables")
-                        add_tables(doc, [subsection["tables"]],templateName)
+                        add_tables(doc, [subsection["content"]],templateName)
 
                     for subsubsection in subsection.get("subSubSections", []):
                         with doc.create(Subsubsection(subsubsection["title"])):
                             doc.append(parse_content(subsubsection["content"]))
-                            if "tables" in subsubsection:
+                            if "<table>" in subsubsection:
                                 # input("found subsection tables")
-                                add_tables(doc, [subsubsection["tables"]],templateName)
+                                add_tables(doc, [subsubsection["content"]],templateName)
     
     
 
