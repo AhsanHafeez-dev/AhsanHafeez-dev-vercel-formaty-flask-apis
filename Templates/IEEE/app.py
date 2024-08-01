@@ -1,31 +1,8 @@
-from Lib.helpers import fill_document, add_raw_preamble , add_preamble , add_packages, parse_content, generate_author_block
+from Lib.helpers import fill_document, add_raw_preamble , add_preamble , add_packages, parse_content, generate_author_block,download_all_images
 from pylatex import Document, Command
 from pylatex.utils import NoEscape
 import database as db
 import os 
-
-doc_config = {
-    "default_filepath": "output/IEEE",
-  "documentclass": "IEEEtran",
-  "document_options": ["conference"],
-  "fontenc": None,
-  "inputenc": None,
-  "lmodern": False,
-  "textcomp": False,
-    # "page_numbers" : False
-}
-
-# Define your packages list
-packages = [
-  {"name": "cite", "options": []},
-  {"name": "amsmath", "options": []},
-  {"name": "amssymb", "options": []},
-  {"name": "amsfonts", "options": []},
-  {"name": "algorithmic", "options": []},
-  {"name": "graphicx", "options": []},
-  {"name": "textcomp", "options": []},
-  {"name": "xcolor", "options": []},
-]
 
 raw_preamble_list = [
     r"\IEEEoverridecommandlockouts",
@@ -33,42 +10,33 @@ raw_preamble_list = [
 
 
 
-def IEEE(project_id):
-    input("IN IEEE ")
-    
-    doc_config,raw_preamble_list_2,packages =  db.get_template_info("IEEEa")
-    
-    input("initialized templates")
+def IEEE(project_id):    
+    doc_config,packages =  db.get_template_info("IEEE")
     doc = Document(**doc_config)
-
     add_raw_preamble(doc, raw_preamble_list)
-    add_packages(doc, packages)
-    input("done with  document initialization")
-
-    print(type(project_id))
-    input(project_id)
+    add_packages(doc, packages)    
     title,authorsList,abstract = db.get_project_preamable_list_info(project_id)
-    
-    input("initialized preamable its")
-    input(title)
+    download_all_images(project_id)
+    # input(title)
     content=db.get_project_content(project_id)
-    
     title_template = NoEscape(r"""{paperName}*\\
-{{\footnotesize {footnotesize}}}
-\thanks{{{thanks}}}
-""".format(paperName=title['PaperName'], footnotesize=title['FootnoteSize'], thanks=title['Thanks']))
-    
-    doc.append(Command('title', title_template))
-    input("set title")
-    author_block = generate_author_block(authorsList)
-    input("doc.append1")
-    doc.append(author_block)
-    input("doc.append2")
-    doc.append(NoEscape(r'\maketitle'))
-    input("done with authors")
+    {{\footnotesize {footnotesize}}}
+    \thanks{{{thanks}}}
+    """.format(paperName=title['paperName'], footnotesize=title['footnotesize'], thanks=title['thanks']))    
+    doc.append(Command('title', title_template))    
+    author_block = generate_author_block(authorsList)    
+    doc.append(author_block)    
+    doc.append(NoEscape(r'\maketitle'))    
     fill_document(doc, content)
-    input("filled document")
-    doc.generate_tex()
     
-    doc.generate_pdf(os.path.join("temporary","IEEE"), clean_tex=False)
+    doc.append(NoEscape(r'\bibliographystyle{plain}'))                                                        # adding biblograhy style
+    doc.append(NoEscape(r'\bibliography{references}'))                                                        # file name for biblography output.bib
+
+    doc.generate_tex()
+    input("going for pdf")
+    try:
+      doc.generate_pdf(os.path.join("temp","IEEE"), clean_tex=False)
+      
+    except Exception as e:
+       print(e)
     return "Successfully generated"

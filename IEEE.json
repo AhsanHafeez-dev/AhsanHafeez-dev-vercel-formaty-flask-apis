@@ -1,10 +1,9 @@
 {
-    "templateName": "IEEEa",
+    "templateName": "IEEE",
     "documentclass": "IEEEtran",
     "document_options": [
-        "stu",
-        "12pt",
-        "floatsintext"
+        "conference",
+        "onecolumn"
     ],
     "fontenc": null,
     "inputenc": null,
@@ -16,6 +15,30 @@
     "packages": [
         {
             "name": "cite",
+            "options": []
+        },
+        {
+            "name": "float",
+            "options": []
+        },
+        {
+            "name": "lastpage",
+            "options": []
+        },
+        {
+            "name": "graphicx",
+            "options": []
+        },
+        {
+            "name": "xurl",
+            "options": []
+        },
+        {
+            "name": "hhline",
+            "options": []
+        },
+        {
+            "name": "multirow",
             "options": []
         },
         {
@@ -46,5 +69,29 @@
             "name": "xcolor",
             "options": []
         }
-    ]
+    ],
+    "keywords": [
+        "phd thesis",
+        "conferences",
+        "book",
+        "documentary"
+    ],
+    "description": "The IEEE (Institute of Electrical and Electronics Engineers) citation style is widely used in technical fields, especially in computer science and engineering. It is a numbered reference style that provides a consistent way to cite sources",
+    "publisher": "APA7",
+    "format": "APA7",
+    "type": "APA7"
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

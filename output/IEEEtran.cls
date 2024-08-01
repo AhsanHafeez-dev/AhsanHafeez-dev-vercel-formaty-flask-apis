@@ -5556,7 +5556,7 @@ between column types.}%
 \def\IEEEQEDoff{\global\@IEEEQEDshowfalse}
 
 
-%\itemindent is set to \z@ by list, so define new temporary variable
+%\itemindent is set to \z@ by list, so define new temp variable
 \newdimen\@IEEEtmpitemindent
 
 \ifCLASSOPTIONcompsoc
