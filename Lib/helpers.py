@@ -75,7 +75,7 @@ def parse_content(text):
     # input("getting citation ids") 
     # input("going to create biblography file")
     if len(citation_ids)>0:
-        print("calling biblography")
+        # print("calling biblography")
         create_biblography_file(citation_ids)
     # input("came to biblography file")
 
@@ -125,7 +125,7 @@ def parse_content(text):
 
 
 
-def add_tables(doc,tables):
+def add_tables(doc,tables,templateName):
     """
     docstring for function
     Input   HTML_Table(Type : str) , doc(LaTex Document)
@@ -139,7 +139,10 @@ def add_tables(doc,tables):
 
         table=re.sub(r"\n","",table)
 
-        tabular_defination,max_columns = get_tabular_defination(table)                  
+        if "APA" in templateName:
+            tabular_defination=get_tabular_defination_APA(table)
+        else:
+            tabular_defination,max_columns = get_tabular_defination(table)                  
 
         patterns = get_pattern_list()                                                              #pattern to be matches                                                                                
         replace_with_list = get_replace_with_list(tabular_defination)                             # replace with to go from html to latex
@@ -198,16 +201,16 @@ def add_raw_preamble(doc, raw_preamble_list):
     doc.preamble.append(NoEscape(raw_preamble))
 
 
-def fill_document(doc, data):
+def fill_document(doc, data,templateName):
     # input("in fill document")
     
     
     for section in data["sections"]:
         with doc.create(Section(section["title"])):
-            print("Sections")
+            # print("Sections")
             doc.append(parse_content(section["content"]))           
             if "tables" in section:
-                add_tables(doc, [section["tables"]] )
+                add_tables(doc, [section["tables"]],templateName )
 
             for subsection in section.get("subSections", []):
                 with doc.create(Subsection(subsection["title"])):
@@ -215,15 +218,15 @@ def fill_document(doc, data):
 
 
                     if "tables" in subsection:
-                        input("found subsection tables")
-                        add_tables(doc, [subsection["tables"]])
+                        # input("found subsection tables")
+                        add_tables(doc, [subsection["tables"]],templateName)
 
                     for subsubsection in subsection.get("subSubSections", []):
                         with doc.create(Subsubsection(subsubsection["title"])):
                             doc.append(parse_content(subsubsection["content"]))
                             if "tables" in subsubsection:
-                                input("found subsection tables")
-                                add_tables(doc, [subsubsection["tables"]])
+                                # input("found subsection tables")
+                                add_tables(doc, [subsubsection["tables"]],templateName)
     
     
 
@@ -265,7 +268,7 @@ def generate_author_block(authors):
 
 
 def create_biblography_file(citation_id_list):        
-    print("biblography")
+    # print("biblography")
     # input(citation_id_list)
     lst_of_citations = db.get_all_citations(citation_id_list)
 
@@ -328,6 +331,18 @@ def get_tabular_defination(table):
                                                                                 # setting latex syntax regading how many columns will be in column
         tabular_defination = '|'.join('c' * max_columns)
         tabular_defination = f"|{tabular_defination}|"
+        get_tabular_defination_APA(table)
+        return [tabular_defination,max_columns]
+
+def get_tabular_defination_APA(table):
+        rows = re.findall(r"<tr>(.*?)</tr>", table, re.DOTALL)
+                                                                                # finding maximum number of columns  for use in tabular defination i.e {c|c|}
+        max_columns = max((sum(1 for _ in re.finditer(r"<td.*?>", row)) for row in rows), default=0)
+        
+                                                                                # setting latex syntax regading how many columns will be in column
+        tabular_defination = ''.join('c' * max_columns)
+        tabular_defination = f"{tabular_defination}"
+        print("APA7 : "+tabular_defination)
         return [tabular_defination,max_columns]
 
 
