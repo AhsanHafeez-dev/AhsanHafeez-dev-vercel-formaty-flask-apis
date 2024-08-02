@@ -13,31 +13,18 @@ def save_to_database(document):
     db.templates.insert_one(document)
 
 def get_all_documents():
-
     cursor=db.templates.find({})
-    documents=[]
-    
+    documents=[]    
     for document in cursor:
         document["_id"]=str(document["_id"])
-        # print(document["_id"])
-        # input("have you compared id")
-        # document.pop("_id")
-        # inserted_document={"docConfig":document["docConfig"],"rawPreamables":document["rawPreamables"],"packages":document["packages"]}
-        
         documents.append( document   )    
-    # input("now error in jsonify")    
-    
     return jsonify(documents)
 
 def find_one(template_name):
     return db.templates.find_one({"templateName":template_name})
 
-def get_all_project_info(project_id):
-    
-    
-        
-    all_info=db.projects.find_one({"_id":project_id})
-    # print("all_info")
+def get_all_project_info(project_id):        
+    all_info=db.projects.find_one({"_id":project_id})    
     all_info.pop("_id")
     return all_info
 
@@ -47,45 +34,29 @@ def get_project_images(project_id):
     return get_all_project_info(project_id)["images"]
 
 def get_project_preamable_list_info(project_id):
-
-    project=get_all_project_info(project_id)
-    # input("got project")
+    project=get_all_project_info(project_id)    
     title=project["title"]
     authorsList=[]
     for author_id in project["authors"]:
-        id=ObjectId(str(author_id))
-        # input(str(id))
-        author=db.users.find_one({"_id":id})
-        # input("author id popping")
-        
+        id=ObjectId(str(author_id))        
+        author=db.users.find_one({"_id":id})        
         author.pop("_id")
         authorsList.append(author)
-
-
     abstract=project["abstract"]
-    # input("returning from get project preamable list function in database")
     return [title,authorsList,abstract]
 
-def get_template_info(template_name):
+def get_template_info(template_name,project_id):
     info=find_one(template_name)
-    # input(info)
+    
     doc_config={
-        "default_filepath": os.path.join("temp","IEEE"),
+        "default_filepath": os.path.join(os.path.join("temp",str(project_id)),template_name),
         "documentclass"     :info [ "documentclass" ]   ,
         "document_options"   :info [ "document_options" ] ,
-        "fontenc"           :info [ "fontenc" ]         ,
-        "inputenc"          :info [ "inputenc" ]        ,
+        "fontenc"           :info [ "fontenc" ]         ,       
         "lmodern"           :info [ "lmodern" ]         ,
         "textcomp"          :info [ "textcomp" ]
-
-
     }
     
-
-    # print("class : ",info["documentclass"])
-
-    
-
     packages=info["packages"]
     return [doc_config,packages]
 
@@ -102,22 +73,18 @@ def add_sample_citations():                                                     
     "Pages"   : "123-456"                                               ,
     "Volume"  : "10"                                                    ,
     "Issue"   : "2"
-    }
-    
+    }    
     db.citation.insert_one(doc)
-
 
 def get_citation_json(citation_id):
     """ 
-    Input : citation_id (Type : ObjectId)
     accept citation_id and return json fetching from db on basis of id
     Warning : In case of citation not found return string message
     """
     try:
         citation=db.citation.find_one({"_id":citation_id}) 
     except Exception as e:
-        print(e)
-        input("stop")
+        print(e)      
     if citation:
         citation["_id"]=str(citation["_id"])
     else:
@@ -134,29 +101,18 @@ def get_citation_title(citation_id):
         return "citation not found"
     
 def get_all_citations(citation_id_list):
-    # print("citation list")
-    # input(citation_id_list)
     citations=[]
     for citation_id in citation_id_list:
-        # input("getting ids")
         citation_id=ObjectId(citation_id)
-        citation= db.citation.find_one({"_id":citation_id})
-        # input("in ids")
+        citation= db.citation.find_one({"_id":citation_id})        
         citation["_id"]=str(citation["_id"])
-        citation["ID"]=citation["_id"]
-        
-        citation.pop("_id")
-        
-        citations.append(citation)
-    # input("returing ids list")
+        citation["ID"]=citation["_id"]        
+        citation.pop("_id")        
+        citations.append(citation)    
     return citations
 
-# def get_author(project_id):
-    
-def get_project_preamable_list(project_id):
-    # input("in funct pream")
-    title,authorsList,abstract=get_project_preamable_list_info(project_id)
-    # input("in2")
+def get_project_preamable_list(project_id):    
+    title,authorsList,abstract=get_project_preamable_list_info(project_id)    
     preamble_list = [
         {"name": "addbibresource", "value": "references.bib"},
         {"name": "title", "value": title['paperName']},

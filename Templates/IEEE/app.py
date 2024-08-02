@@ -12,13 +12,13 @@ raw_preamble_list = [
 
 def IEEE(project_id):    
     templateName="IEEE"
-    doc_config,packages =  db.get_template_info(templateName)
+    doc_config,packages =  db.get_template_info(templateName,project_id)
     doc = Document(**doc_config)
     add_raw_preamble(doc, raw_preamble_list)
     add_packages(doc, packages)    
     title,authorsList,abstract = db.get_project_preamable_list_info(project_id)
     download_all_images(project_id)
-    # input(title)
+    
     content=db.get_project_content(project_id)
     
     title_template = NoEscape(r"""{paperName}*\\
@@ -29,13 +29,14 @@ def IEEE(project_id):
     author_block = generate_author_block(authorsList)    
     doc.append(author_block)    
     doc.append(NoEscape(r'\maketitle'))    
-    fill_document(doc, content,templateName)
-    
+    fill_document(doc, content,templateName,project_id)
+    doc.append(NoEscape(r'\bibliographystyle{plain}'))
+    doc.append(NoEscape(r'\bibliography{references}'))
 
     doc.generate_tex()
-    print("going for pdf")
+    print("creating for pdf for IEEE")
     try:
-      doc.generate_pdf(os.path.join("temp","IEEE"), clean_tex=False)
+      doc.generate_pdf(os.path.join(os.path.join("temp",str(project_id)),"IEEE"), clean_tex=False)
       
     except Exception as e:
        print(e)

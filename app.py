@@ -111,13 +111,32 @@ responses:
     description: Invalid input data
 """
 
-    template=request.get_json()
-    if template is not None:
+    # template=request.get_json()
+    # if template is not None:
+    #         db.save_to_database(template)
+
+
+
+
+    # list of all templates to be inserted
+
+
+    jsons=["IEEE.json","APA7.json"]
+
+    template=None
+    
+    
+    for file in jsons:
+        with open(file,"r") as json_file:
+            template=json.load(json_file)
+
+        # if template is not available already insert it    
+        if template is not None:
             db.save_to_database(template)
+            
 
 
-
-
+        template=None
 
     return "Successfully inserted templates "
 
@@ -187,7 +206,8 @@ def get_template():
 
     if template_name:
         try:
-            dump_folder="temp"
+            dump_folder=os.path.join("temp",str(project_id))
+          
             try:
                 shutil.rmtree(dump_folder)                
             except Exception as e:

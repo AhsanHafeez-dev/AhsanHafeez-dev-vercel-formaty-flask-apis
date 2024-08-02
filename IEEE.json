@@ -2,8 +2,7 @@
     "templateName": "IEEE",
     "documentclass": "IEEEtran",
     "document_options": [
-        "conference",
-        "onecolumn"
+        "conference"
     ],
     "fontenc": null,
     "inputenc": null,
