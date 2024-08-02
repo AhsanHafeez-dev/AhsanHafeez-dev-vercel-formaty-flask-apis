@@ -1,63 +1,29 @@
-from pylatex.base_classes import Environment
-from pylatex.package import Package
-from pylatex.utils import NoEscape , italic, bold , NoEscape
-from pylatex import Document, Section, Subsection, Subsubsection, Command, Itemize, Enumerate, Table, Tabular,NewLine
 import json
+import os
 import re
-from werkzeug.utils import secure_filename
-import firebase_admin
-from firebase_admin import credentials,storage
-from dotenv import load_dotenv
-import os 
 import shutil
-from bson import ObjectId
-import database as db
+from urllib.request import urlretrieve
+
 import bibtexparser
+import firebase_admin
 from bibtexparser.bibdatabase import BibDatabase
 from bibtexparser.bwriter import BibTexWriter
-from urllib.request import urlretrieve
+from bson import ObjectId
+from dotenv import load_dotenv
+from firebase_admin import credentials, storage
+from pylatex import (Command, Document, Enumerate, Itemize, NewLine, Section,
+                     Subsection, Subsubsection, Table, Tabular)
+from pylatex.base_classes import Environment
+from pylatex.package import Package
+from pylatex.utils import NoEscape, bold, italic
+from werkzeug.utils import secure_filename
+
+import database as db
+
 downloads={}
 def demo():
     return "hello this is working"
 
-def find_row_pattern(text):
-    rows = re.findall(r"<tr>(.*?)</tr>", text, re.DOTALL) # Find all rows in the table
-    if not rows:
-        return "No rows found in the provided HTML content."
-
-    max_columns = max((len(re.findall(r"<td.*?>", row)) for row in rows), default=0) # Find the maximum number of <td> elements in any row
-        
-    if max_columns == 0:
-        return "No <td> elements found in the rows."
-
-    # Generate the tabular definition based on max_columns
-    tabular_definition = '|'.join(['c'] * max_columns)
-    tabular_definition = f'|{tabular_definition}|'
-    return tabular_definition
-
-
-def handle_tables(text):
-
-    # Replace <td colspan='x'>...</td> with \multicolumn{x}{|c|}{...} &
-    pattern_td_colspan = r"<td colspan='(\d+)'>(.*?)</td>"
-    replacement_td_colspan = r'\\multicolumn{\1}{|c|}{\2} & '
-    text = re.sub(pattern_td_colspan, replacement_td_colspan, text)
-
-    tabular_definition = find_row_pattern(text)
-
-    text = re.sub(r"<td>(.*?)</td>", r'{\1} & ', text) # Replace <td>...</td> with {...} &
-    text = re.sub(r'\n','', text) #removes new_line
-    text = re.sub(r"<tr>", r' \n\\hline\n', text) # Replace <tr> with \hline
-    text = re.sub(r"</tr>", '-1', text) # Replace </tr> with empty string
-    text = re.sub(r'& -1','', text) #removes last row
-
-    # Replace <table title='Table Caption' align='center'>
-    pattern_table = r"<table title='(.*?)' align='center'>"    
-    replacement_table = r'\n\\begin{table}[htbp]\n\\caption{\1}\n\\begin{center}\n\\begin{tabular}{%s}\n' % tabular_definition
-    text = re.sub ( pattern_table, replacement_table, text)
-    text = re.sub ( r"</table>", r'\n\\end{tabular}\n\\label{tab1}\n\\end{center}\n\\end{table}\n', text) # Replace </table>
-    return text
-    
 
 
 def parse_content(doc,text,templateName):
@@ -116,21 +82,6 @@ def parse_content(doc,text,templateName):
 
 
 
-
-
-# def add_tables(doc, tables):
-#     for table in tables:
-#         with doc.create(Table(position='h')) as tab:
-#             tab.add_caption(table["caption"])
-#             tab.append(Command("centering"))
-#             with doc.create(Tabular('c' * len(table["data"][0]))) as tabular:
-#                 tabular.add_hline()
-#                 for row in table["data"]:
-#                     tabular.add_row(row)
-#                     tabular.add_hline()
-
-
-
 def add_tables(doc,html_content,templateName):
     """
     docstring for function
@@ -148,14 +99,17 @@ def add_tables(doc,html_content,templateName):
         raw_table=re.sub(r"\n","",raw_table)
 
         if "APA" in templateName:
-            tabular_defination=get_tabular_defination_APA(raw_table)
+            tabular_defination,max_columns=get_tabular_defination_APA(raw_table)
         else:
             tabular_defination,max_columns = get_tabular_defination(raw_table)                  
 
         patterns = get_pattern_list()                                                              #pattern to be matches                                                                                
         replace_with_list = get_replace_with_list(tabular_defination)                             # replace with to go from html to latex
+        if "APA" in templateName:
+            replace_with_list[0]=r"\\multicolumn{\1}{c}{\2} &"
         
         for i in range(len(patterns)):  
+            
             raw_table = re.sub(patterns[i], replace_with_list[i], raw_table)           # replace every html pattern with latex syntax
 
         raw_table=handle_multi_row(raw_table,max_columns)        
@@ -219,7 +173,7 @@ def fill_document(doc, data,templateName):
     
     for section in data["sections"]:
         with doc.create(Section(section["title"])):
-            # print("Sections")
+            print("Sections")
             
             content=parse_content(doc,section["content"],templateName)
             doc.append(content)
@@ -239,28 +193,6 @@ def fill_document(doc, data,templateName):
     
     
 
-# def fill_document(doc,data):
-    
-    
-#     for section in data["sections"]:
-#         with doc.create(Section(section["title"])):
-#             doc.append(parse_content(section["content"]))           
-#             if "tables" in section:
-#                 add_tables(doc, [section["tables"]] )
-
-#     for subsection in data["subSections"]:
-#         with doc.create(Subsection(subsection["title"])):
-#             doc.append(parse_content(subsection["content"]))
-#             if "tables" in subsection:
-#                 add_tables(doc,[subsection["tables"]])
-
-#     for subsubsection in data["subSubSections"]:
-#         with doc.create(Subsubsection(subsubsection["title"])):
-#             doc.append(parse_content(subsubsection["content"]))
-#             if "tables" in subsubsection:
-#                 add_tables(doc,[subsection["tables"]])    
-
-#     # input("going back from fill form")
 def generate_author_block(authors):
 
     author_block = r'\author{'
@@ -287,13 +219,6 @@ def create_biblography_file(citation_id_list):
     
     with open('temp/references.bib','w') as bib_file:
         bib_file.write(bib_str)
-
-
-    # writer = BibTexWriter()
-    # writer.indent = '    '     # indent entries with 4 spaces instead of one
-    # writer.comma_last = True  # place the comma at the beginning of the line
-    # with open('temp/references.bib', 'w') as bibfile:
-    #     bibfile.write(writer.write(bib_db))        
         
         
 def get_pattern_list():
@@ -351,7 +276,7 @@ def get_tabular_defination_APA(table):
                                                                                 # setting latex syntax regading how many columns will be in column
         tabular_defination = ''.join('c' * max_columns)
         tabular_defination = f"{tabular_defination}"
-        # print("APA7 : "+tabular_defination)
+        # input("APA7 : "+tabular_defination)
         return [tabular_defination,max_columns]
 
 

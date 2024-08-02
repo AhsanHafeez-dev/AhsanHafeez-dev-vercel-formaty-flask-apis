@@ -151,4 +151,21 @@ def get_all_citations(citation_id_list):
     # input("returing ids list")
     return citations
 
-# 
+# def get_author(project_id):
+    
+def get_project_preamable_list(project_id):
+    # input("in funct pream")
+    title,authorsList,abstract=get_project_preamable_list_info(project_id)
+    # input("in2")
+    preamble_list = [
+        {"name": "addbibresource", "value": "references.bib"},
+        {"name": "title", "value": title['paperName']},
+        {"name": "shorttitle", "value": title['shorttitle']},
+        {"name": "author", "value": authorsList[0]['userName']},
+        {"name": "duedate", "value": "April 20, 2024"},
+        {"name": "affiliation", "value": authorsList[0]['university']},
+        {"name": "course", "value": title['course']},
+        {"name": "professor", "value": title['professor']},
+        {"name": "abstract", "value": abstract},
+        ]
+    return preamble_list

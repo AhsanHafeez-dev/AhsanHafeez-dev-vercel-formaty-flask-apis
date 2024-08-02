@@ -77,9 +77,9 @@
         "documentary"
     ],
     "description": "The IEEE (Institute of Electrical and Electronics Engineers) citation style is widely used in technical fields, especially in computer science and engineering. It is a numbered reference style that provides a consistent way to cite sources",
-    "publisher": "APA7",
-    "format": "APA7",
-    "type": "APA7"
+    "publisher": "IEEE",
+    "format": "IEEE",
+    "type": "IEEE"
 }
 
 

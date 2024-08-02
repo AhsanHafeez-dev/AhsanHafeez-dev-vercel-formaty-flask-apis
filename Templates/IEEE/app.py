@@ -20,6 +20,7 @@ def IEEE(project_id):
     download_all_images(project_id)
     # input(title)
     content=db.get_project_content(project_id)
+    
     title_template = NoEscape(r"""{paperName}*\\
     {{\footnotesize {footnotesize}}}
     \thanks{{{thanks}}}
@@ -30,8 +31,6 @@ def IEEE(project_id):
     doc.append(NoEscape(r'\maketitle'))    
     fill_document(doc, content,templateName)
     
-    doc.append(NoEscape(r'\bibliographystyle{plain}'))                                                        # adding biblograhy style
-    doc.append(NoEscape(r'\bibliography{references}'))                                                        # file name for biblography output.bib
 
     doc.generate_tex()
     print("going for pdf")

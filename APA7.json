@@ -21,6 +21,30 @@
             ]
         },
         {
+            "name": "float",
+            "options": []
+        },
+        {
+            "name": "lastpage",
+            "options": []
+        },
+        {
+            "name": "graphicx",
+            "options": []
+        },
+        {
+            "name": "xurl",
+            "options": []
+        },
+        {
+            "name": "hhline",
+            "options": []
+        },
+        {
+            "name": "multirow",
+            "options": []
+        },
+        {
             "name": "fontenc",
             "options": [
                 "T1"
@@ -55,25 +79,6 @@
     "format":"APA7",
     "type":"APA7"
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
