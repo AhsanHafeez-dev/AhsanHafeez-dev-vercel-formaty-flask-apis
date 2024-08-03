@@ -39,10 +39,12 @@ def get_project_preamable_list_info(project_id):
     authorsList=[]
     for author_id in project["authors"]:
         id=ObjectId(str(author_id))        
-        author=db.users.find_one({"_id":id})        
+        author=db.users.find_one({"_id":id}) 
+        # input(author)       
         author.pop("_id")
         authorsList.append(author)
-    abstract=project["abstract"]
+    abstract=title["abstract"]
+    title["keywords"]=",".join(title["keywords"])
     return [title,authorsList,abstract]
 
 def get_template_info(template_name,project_id):
@@ -123,5 +125,9 @@ def get_project_preamable_list(project_id):
         {"name": "course", "value": title['course']},
         {"name": "professor", "value": title['professor']},
         {"name": "abstract", "value": abstract},
+        {"name":"keywords","value":title["keywords"]}
         ]
     return preamble_list
+
+def get_key_words(lst):
+    return lst[-1]["value"]

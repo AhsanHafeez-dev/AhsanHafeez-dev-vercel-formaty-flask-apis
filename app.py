@@ -212,6 +212,7 @@ def get_template():
                 shutil.rmtree(dump_folder)                
             except Exception as e:
                 print("folder doesnot exits before")  
+            # input(dump_folder)
             os.makedirs(dump_folder)
             # db.add_sample_citations()
             # input("added sample citation to database")

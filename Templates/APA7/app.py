@@ -18,9 +18,10 @@ def APA7( project_id):
     templateName="APA7"
     doc_config,packages = db.get_template_info("APA7",project_id)
     preamble_list=db.get_project_preamable_list(project_id)
-        
+    keywords=db.get_key_words(preamble_list)        
     doc = Document(**doc_config)
-    doc.append(Command("maketitle"))            
+    doc.append(Command("maketitle"))   
+    doc.append(NoEscape(f'\keywords{{{keywords}}}'))         
     fill_document(doc, content,templateName,project_id)
     doc.append(Command("printbibliography"))    
     add_raw_preamble(doc, raw_preamble_list)

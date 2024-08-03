@@ -42,6 +42,7 @@ def parse_content(doc,text,templateName,project_id):
 
     # Handle list items
     text = text.replace("<li>", "\\item ").replace("</li>", "")
+    text=re.sub(r"<p>(.*?</p>)",r"\1\n\n",text)
     citation_ids=re.findall(r"<cite>(.*?)</cite>",text,re.DOTALL )
     
     
@@ -188,8 +189,8 @@ def add_raw_preamble(doc, raw_preamble_list):
 def fill_document(doc, data,templateName,project_id):
     
     
-    
-    for section in data["sections"]:
+    # input(data)
+    for section in data["included"]:
         with doc.create(Section(section["title"])):
             print("Sections")
             
@@ -331,7 +332,7 @@ def handle_multi_row(table,max_columns):
 def download_all_images(project_id):
     
     img_url_lst=db.get_project_images(project_id)
-    
+    img_url_lst=["https://media.geeksforgeeks.org/wp-content/uploads/20210224040124/JSBinCollaborativeJavaScriptDebugging6-300x160.png" ]
     i=1
     for image_url in img_url_lst:
         filename=f'image_{str(i)}'
