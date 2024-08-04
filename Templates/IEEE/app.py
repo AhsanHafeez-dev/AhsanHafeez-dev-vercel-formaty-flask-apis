@@ -1,9 +1,9 @@
-from Lib.helpers import fill_document, add_raw_preamble , add_preamble , add_packages, parse_content, generate_author_block,download_all_images
+from Lib.helpers import fill_document, add_raw_preamble , add_preamble , add_packages,  generate_author_block,download_all_images
 from pylatex import Document, Command
 from pylatex.utils import NoEscape
 import database as db
 import os 
-
+from flask import send_file
 raw_preamble_list = [
     r"\IEEEoverridecommandlockouts",
 ]
@@ -56,9 +56,12 @@ def IEEE(project_id):
     doc.generate_tex()
     print("creating for pdf for IEEE")
     # input("going for  pdf")
+    file_path=os.path.join(os.path.join("temp",str(project_id)),"IEEE")
+    
     try:
-      doc.generate_pdf(os.path.join(os.path.join("temp",str(project_id)),"IEEE"), clean_tex=False)
+      doc.generate_pdf(file_path, clean_tex=False)
       
     except Exception as e:
        print(e)
-    return "Successfully generated"
+    
+    return [file_path+".pdf","IEEE.pdf"]

@@ -12,3 +12,13 @@ pymongo
 
 firebase-admin
 bs4
+
+
+
+
+
+
+
+
+
+

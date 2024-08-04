@@ -1,4 +1,4 @@
-from Lib.helpers import fill_document, add_raw_preamble , add_preamble , add_packages
+from Lib.helpers import fill_document, add_raw_preamble , add_preamble , add_packages,download_all_images
 from pylatex import Document, Command,NoEscape
 import database as db
 import os
@@ -19,6 +19,7 @@ def APA7( project_id):
     doc_config,packages = db.get_template_info("APA7",project_id)
     preamble_list=db.get_project_preamable_list(project_id)
     keywords=db.get_key_words(preamble_list)        
+    download_all_images(project_id)    
     doc = Document(**doc_config)
     doc.append(Command("maketitle"))   
     doc.append(NoEscape(f'\keywords{{{keywords}}}'))         
@@ -29,4 +30,6 @@ def APA7( project_id):
     add_packages(doc, packages)
     doc.generate_tex()
     # doc.generate_pdf(os.path.join(os.path.join("temp",str(project_id)),"APA7"), clean_tex=False)
-    return "Successfully Generated APA Format"
+    input("see tex")
+    path=os.path.join(os.path.join("temp",str(project_id)),"APA7")
+    return [path+".tex","APA7.tex"]

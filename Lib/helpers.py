@@ -34,6 +34,9 @@ def parse_content(doc,text,templateName,project_id):
     
     text = text.replace("<b>", "\\textbf{").replace("</b>", "}")
     
+    text=re.sub(r"(.*?)<sup>(.*?)</sup>",r"\1^{\2}",text)
+    text=re.sub(r"(.*?)<sub>(.*?)</sub>",r"\1_{\2}",text)
+
     text = text.replace("<i>", "\\textit{").replace("</i>", "}")
 
     # Handle unordered lists
@@ -334,6 +337,7 @@ def download_all_images(project_id):
     img_url_lst=db.get_project_images(project_id)
     img_url_lst=["https://media.geeksforgeeks.org/wp-content/uploads/20210224040124/JSBinCollaborativeJavaScriptDebugging6-300x160.png" ]
     i=1
+    
     for image_url in img_url_lst:
         filename=f'image_{str(i)}'
         path=os.path.join(os.path.join("temp",str(project_id)),filename+'.jpeg'  )
@@ -343,12 +347,14 @@ def download_all_images(project_id):
     
 
 def get_image_name(url):
+    
     return downloads[url]  
 def replace_img_tag(match):
     url = match.group(1)
     alt = match.group(2)
     image_name = get_image_name(url)
     figure="figure"
+    
     width="375pt"
     height="375pt"
     return f'''

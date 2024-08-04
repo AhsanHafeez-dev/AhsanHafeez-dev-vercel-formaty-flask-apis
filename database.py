@@ -1,7 +1,6 @@
 from flask_pymongo import PyMongo
 from flask import jsonify
 from app import app
-import json
 from bson import  ObjectId
 import os
 # app.config["MONGO_URI"]="mongodb+srv://ahsan:Hamza3755@templates.xrcj1en.mongodb.net/testing?retryWrites=true&w=majority&appName=templates"
@@ -131,3 +130,6 @@ def get_project_preamable_list(project_id):
 
 def get_key_words(lst):
     return lst[-1]["value"]
+
+def get_tenplate_name(project_id):
+    return db.projects.find_one({"_id":project_id})["templateName"]

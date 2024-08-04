@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,send_file
 from flasgger import Swagger
 from bson import  ObjectId
 import importlib
@@ -18,7 +18,7 @@ def homePost():
     """
 ---
 tags:
-  - LaTeX
+  - Templates
 summary: Create a LaTeX document template
 description: This endpoint creates a LaTeX document template based on the provided configuration.
 parameters:
@@ -147,47 +147,40 @@ def getAll():
     """
     templates route 
     ---
+    tags:
+      - Templates
     responses:
       200:
         description: Returns List of all available templates
-    """
+"""
+
     return db.get_all_documents()
 
 
-@app.route("/create-paper", methods=["POST"])
+@app.route("/create-paper", methods=["GET"])
 def get_template():    
 
     """
-    Process the template based on the provided template name and project ID.
+    Create a  LaTeX document and return the pdf after compiling porject
     ---
     tags:
-      - Template Processing
+      - Paper Creation
     parameters:
-      - in: body
-        name: body
-        schema:
-          type: object
-          required:
-            - templateName
-            - project_id
-          properties:
-            templateName:
-              type: string
-              description: The name of the template to be used.
-              example: IEEE
-            project_id:
-              type: string
-              description: The project ID to be processed.
-              example: 60c72b2f9af1f145d4b7a123
+      - in: query
+        name: project_id
+        type: string
+        required: true
+        description: The project ID to be processed.
+        example: 60c72b2f9af1f145d4b7a123
     responses:
       200:
-        description: Successfully processed the template
+        description: templateName.pdf 
         schema:
           type: object
           properties:
             message:
               type: string
-              description: The response message after processing the template
+              description: The PDF file created from the project
       400:
         description: Bad request
         schema:
@@ -196,14 +189,13 @@ def get_template():
             error:
               type: string
               description: Error message explaining what went wrong
+              example: templateName not provided
+"""
 
-
-    """
-    data = request.get_json()
-    template_name = data.get('templateName')
-    template_name=data.get('templateName')
-    project_id=ObjectId(data.get("project_id")) 
-
+    
+    project_id=ObjectId(request.args.get("project_id")) 
+    template_name=db.get_tenplate_name(project_id)
+    
     if template_name:
         try:
             dump_folder=os.path.join("temp",str(project_id))
@@ -222,9 +214,10 @@ def get_template():
             template_func = getattr(module, template_name)
             # print("function imported")
             response = template_func(project_id)          
-            input("deleting folder")  
-            shutil.rmtree(dump_folder)
-            return jsonify({"message": response}), 200
+            
+            
+            
+            return send_file(response[0],as_attachment=True,download_name=response[1])
         
         except (ModuleNotFoundError, AttributeError) as e:
             return jsonify({"error": str(e)}), 400
