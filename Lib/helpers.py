@@ -25,6 +25,7 @@ def demo():
 
 
 def parse_content(doc,text,templateName,project_id):
+    # input("in parse content")
     # text = handle_tables(text)
     
     
@@ -45,7 +46,10 @@ def parse_content(doc,text,templateName,project_id):
 
     # Handle list items
     text = text.replace("<li>", "\\item ").replace("</li>", "")
-    text=re.sub(r"<p>(.*?</p>)",r"\1\n\n",text)
+    # input(text)
+    text = re.sub(r"<p>(.*?)</p>", r"\1\n\n", text)
+    text = re.sub(r"<h1>(.*?)</h1>", r"\\textbf{\1}\n\n", text)
+    # input(text)
     citation_ids=re.findall(r"<cite>(.*?)</cite>",text,re.DOTALL )
     
     
@@ -196,7 +200,7 @@ def fill_document(doc, data,templateName,project_id):
     for section in data["included"]:
         with doc.create(Section(section["title"])):
             print("Sections")
-            
+
             content=parse_content(doc,section["content"],templateName,project_id)
             doc.append(content)
 
