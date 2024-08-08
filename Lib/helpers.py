@@ -39,38 +39,52 @@ def parse_content(doc,text,templateName,project_id):
     
     
     
-    # input("in parse content")
-    text=add_tables(doc,text,templateName)                                                          # convert html table to latex tables            
-    text = text.replace("<b>", "\\textbf{").replace("</b>", "}")                                    # replace b tag with \textbf(bold in latex)
-    text=re.sub(r"(.*?)<sup>(.*?)</sup>",r"\1^{\2}",text)                                           # replace supSript tag wih ^ in latex (raise to or power)    
-    text=re.sub(r"(.*?)<sub>(.*?)</sub>",r"\1_{\2}",text)                                           # replace SubScrpit tag with _ sub scrpit in latex
-    text = text.replace("<i>", "\\textit{").replace("</i>", "}")                                    #replacing <i> with texttit (italic in latex)
-    text = text.replace("<ul>", "\\begin{itemize}").replace("</ul>", "\\end{itemize}")             # Handle unordered lists
-    text = text.replace("<ol>", "\\begin{enumerate}").replace("</ol>", "\\end{enumerate}")          # Handle orded lits
-    text = text.replace("<li>", "\\item ").replace("</li>", "")                                     # Handle list items
+    input("in parse content")
+    # input("0")
     # input(text)
-    text = re.sub(r"<p>(.*?)</p>", r"\1\n\n", text)                                                 # handling paragraph by replacing p tag with new line
-    text = re.sub(r"<h.*?>(.*?)</h.*?>", r"\\textbf{\1}\n\n", text)                                 # handling heading in html by \textbf in latex
+    text=add_tables(doc,text,templateName)      
+    # input("1")
+    # input(text)                                                                                    # convert html table to latex tables            
+    text = text.replace("<b>", "\\textbf{").replace("</b>", "}")                                     # replace b tag with \textbf(bold in latex)
+    # input("2")
     # input(text)
-    citation_ids=re.findall(r"<cite>(.*?)</cite>",text,re.DOTALL )                                  # getting all citation from database    
-    if len(citation_ids)>0:                                                                         # if there is any citation
+    text=re.sub(r"(.*?)<sup>(.*?)</sup>",r"\1^{\2}",text)                                            # replace supSript tag wih ^ in latex (raise to or power)    
+    # input("3")
+    # input(text)
+    text=re.sub(r"(.*?)<sub>(.*?)</sub>",r"\1_{\2}",text)                                            # replace SubScrpit tag with _ sub scrpit in latex
+    
+    text = text.replace("<i>", "\\textit{").replace("</i>", "}")   
+                                    #replacing <i> with texttit (italic in latex)
+    text = text.replace("<ul>", "\\begin{itemize}").replace("</ul>", "\\end{itemize}")    
+    text = text.replace("<ol>", "\\begin{enumerate}").replace("</ol>", "\\end{enumerate}")           # Handle orded lits
+    text = text.replace("<li>", "\\item ").replace("</li>", "")                                      # Handle list items
+    # input(text)
+    text = re.sub(r"<p>(.*?)</p>", r"\1\n\n", text)                                                  # handling paragraph by replacing p tag with new line
+    text = re.sub(r"<h.*?>(.*?)</h.*?>", r"\\textbf{\1}\n\n", text)                                  # handling heading in html by \textbf in latex
+    # input(text)
+    citation_ids=re.findall(r"<cite>(.*?)</cite>",text,re.DOTALL )                                   # getting all citation from database    
+    if len(citation_ids)>0:                                                                          # if there is any citation
         # print("calling biblography")
-        create_biblography_file(citation_ids,project_id)                                            # creating a biblography file 
+        create_biblography_file(citation_ids,project_id)                                             # creating a biblography file 
             # Replace citation IDs with titles
     for citation_id in citation_ids:                                                        
-        title = db.get_citation_title(citation_id)                                              # getting all tittles from citation ids 
-        text = text.replace(f"<cite>{citation_id}</cite>", f"\\cite{{{title}}}")                # replace ids with title(obj id)
+        title = db.get_citation_title(citation_id)                                                  # getting all tittles from citation ids 
+        text = text.replace(f"<cite>{citation_id}</cite>", f"\\cite{{{title}}}")                    # replace ids with title(obj id)
         # text = text.replace(f"<cite type='paren'>{citation_id}</cite>", f"\\parencite{{{title}}}")
     # text = re.sub(r"<cite>(.*?)</cite>", f'\\cite{get_citation_title(\1)}', text)
     # text = re.sub(r"<cite type='paren'>(.*?)</cite>", r'\\parencite{\1}', text)
 
 
     # Handle images
-    # print("going for imags")
-    text = re.sub(r'<img alt=(.*?) src=(.*?)>'
-, replace_img_tag, text)     # Handle images
-    # input(re.findall(r'<img alt=(.*?) src=(.*?)>',text,re.DOTALL))
+    print("going for imags")
     # input(text)
+    # input(re.findall(r'<img .*? />',text,re.DOTALL))
+
+    text = re.sub(r'<img alt=(.*?) src=(.*?)>'
+    , replace_img_tag, text)
+
+    
+    # input("done with images")
     # print("images")
     # print(re.findall(r"\\begin{figure}",txt,re.DOTALL))
     # print(text)    
@@ -92,24 +106,27 @@ def add_tables(doc,html_content,templateName):
     """    
 
     
-    soup=BeautifulSoup(html_content,"html.parser")
-    thead=soup.find_all("thead")
-    # input(thead)
-    for head in thead:
-        for td in head.find_all('td'):
-            tag=soup.new_tag('b')
-            tag.string=td.string
-            td.string=""
-            td.append(tag)
-            # input(td)
-    html_content=str(soup)
-    # input(html_content)
+    soup=BeautifulSoup(html_content,"html.parser")                                                   # using beautiful soup parser library
+    thead=soup.find_all("thead")                                                                     # get all the thead tags
+    
+    for head in thead:                                          
+
+        for td in head.find_all('td'):                                                               # for each data item td
+            
+            tag=soup.new_tag('b')                                                                    # create a new b tag which we want to insert
+            tag.string=td.string                                                                     # add the string or data to it
+            td.string=""                                                                             # empty the previous data
+            td.append(tag)                                                                           # add b tag with data
+    
+    html_content=str(soup)                                                                           # now this is new content where each header is bold now
+
+    
     tables=re.findall("<table.*>.*?</table>",html_content,re.DOTALL)
     for table in tables:
         raw_table=table
         raw_table=re.sub(r"\n","",raw_table)
                 
-        if "APA" in templateName:
+        if "APA" in templateName:                                                                       # in apa7 we dont have vertical lines
             tabular_defination,max_columns=get_tabular_defination_APA(raw_table)
         else:
             tabular_defination,max_columns = get_tabular_defination(raw_table)                  
@@ -120,11 +137,11 @@ def add_tables(doc,html_content,templateName):
             replace_with_list[1]=r"\\multicolumn{\1}{c}{\2} &"
         
         for i in range(len(patterns)):  
-            raw_table = re.sub(patterns[i], replace_with_list[i], raw_table)                # replace every html pattern with latex syntax
+            raw_table = re.sub(patterns[i], replace_with_list[i], raw_table)                            # replace every html pattern with latex syntax
             # input(raw_table)
-
+        input(raw_table)
         raw_table=handle_multi_row(raw_table,max_columns)        
-        
+        input(raw_table)
         
         html_content=html_content.replace(table,raw_table)
                 # but still html
@@ -159,9 +176,9 @@ def add_preamble(doc, preamble_list):
                   - value (optional): The value for the command (str).
   """
   for command in preamble_list:
-            # Extract command name and value (if provided)
+                                                                                             # Extract command name and value (if provided)
     name = command["name"]
-    value = command.get("value", None)          # Use .get() for optional value
+    value = command.get("value", None)                                                       # Use .get() for optional value
 
             # Append the command using Command class
     doc.preamble.append(Command(name, value))
@@ -194,11 +211,11 @@ def fill_document(doc, data,templateName,project_id):
     """
     
     
-            # input(data)
+            
     for section in data["included"]:
         with doc.create(Section(section["title"])):
             print("Sections")
-
+            input(section['content'])
             content=parse_content(doc,section["content"],templateName,project_id)
             doc.append(content)
 
@@ -400,10 +417,16 @@ def download_all_images(project_id):
         parsed_url = urlparse(image_url)
         path = parsed_url.path
         file_ext = os.path.splitext(path)[-1].lower()
+        if not file_ext:
+            file_ext=".jpeg"
+            
+
         filename=f'image_{str(i)}{file_ext}'
         
         path=os.path.join(os.path.join("temp",str(project_id)),filename  )
+        
         url_mapping[image_url]=filename
+        
         urlretrieve(image_url, path)
         i+=1
     
@@ -415,6 +438,9 @@ def get_image_name(url):
     Description:
         -map name to url
     """
+    # print("getting image name")
+    # input(url)
+    # input("seee url")
     return url_mapping[url]  
 def replace_img_tag(match):
     """ 
@@ -423,15 +449,26 @@ def replace_img_tag(match):
     Description:
         - latex code for showing image
     """
-    # input("match")
+    input("match")
     url = match.group(2).strip('"/"')
-    alt = match.group(1)
+    alt = match.group(1).strip('"')  
     # input(url_mapping)
     image_name = get_image_name(url)
     figure="figure"
-    # input("dshkehgiregire")
     width="375pt"
     height="375pt"
+    
+    if image_name.endswith("svg"):
+        return f'''
+        \\begin{{{figure}}}[htbp] 
+        \\centering
+        \\includesvg[width=\\linewidth]{{{image_name}}}
+        \\caption{{{alt}}}
+        \\label{{fig:{image_name}}}
+        \\end{{{figure}}}'''    
+    
+    
+
     return f'''
     \\begin{{{figure}}}[htbp] 
     \\centerline{{\\includegraphics[width=\\linewidth]{{{image_name}}}}}
@@ -440,4 +477,4 @@ def replace_img_tag(match):
     \\end{{{figure}}}'''    
 
 
-        #end of helper
+#end of helper

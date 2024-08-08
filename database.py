@@ -12,6 +12,14 @@ def save_to_database(document):
     db.templates.insert_one(document)
 
 def get_all_documents():
+    """ 
+    Arguments : 
+        - None
+    Return : 
+        - documents : Type(json)
+    Description : 
+        - get all the avaaiable templates and return in form of json
+    """
     cursor=db.templates.find({})
     documents=[]    
     for document in cursor:
@@ -29,10 +37,19 @@ def get_all_project_info(project_id):
 
 def get_project_content(project_id):
     return get_all_project_info(project_id)["content"]
+
 def get_project_images(project_id):
     return get_all_project_info(project_id)["images"]
 
 def get_project_preamable_list_info(project_id):
+    """ 
+    Arguments : 
+        - project_id : Type(str)
+    Return : 
+        - List of 3 elements
+    Description : 
+        - get all the project info based on project id and return list of title authorlist and abstract
+    """
     project=get_all_project_info(project_id)    
     title=project["title"]
     authorsList=[]
@@ -47,6 +64,15 @@ def get_project_preamable_list_info(project_id):
     return [title,authorsList,abstract]
 
 def get_template_info(template_name,project_id):
+    """ 
+    Arguments : 
+        - templateName : Type(str)
+        - project_id   : Type(syt)
+    Return : 
+        - List of 2 elements
+    Description : 
+        - get all the document initialization info and structured it into desired format and also specifying folder to save files
+    """
     info=find_one(template_name)
     
     doc_config={
@@ -62,6 +88,9 @@ def get_template_info(template_name,project_id):
     return [doc_config,packages]
 
 def add_sample_citations():                                                                         # this is temp function for generating sample citations
+    """  
+    write sample ciation to db it will be removed before pushing to production it is just for development and testing purposes
+    """
     doc = {
     # "_id"     : ObjectId("60d5f3b7b7e6fbe5c56d3b2b")                    ,
     "type"    : "Journal Article"                                       ,                           # type is not part of .bib its just for our logic
@@ -91,7 +120,16 @@ def get_citation_json(citation_id):
     else:
         return "citation not found"  
     return citation
+
 def get_citation_title(citation_id):
+    """ 
+    Arguments : 
+        - citaion_id : Type(str)
+    Return : 
+        - title : Type(str)
+    Description : 
+        - replace citation with its id so latex can map it from biblography file
+    """
     citation_id=ObjectId(citation_id)
     info=db.citation.find_one({"_id":citation_id})
     if info:
@@ -102,17 +140,33 @@ def get_citation_title(citation_id):
         return "citation not found"
     
 def get_all_citations(citation_id_list):
+    """ 
+    Arguments : 
+        - citation_id_list : Type(str)
+    Return : 
+        - citations : Type(list)
+    Description : 
+        - fetch all citation in list and format it in format requuired by bibtexparser library
+    """
     citations=[]
     for citation_id in citation_id_list:
         citation_id=ObjectId(citation_id)
         citation= db.citation.find_one({"_id":citation_id})        
-        citation["_id"]=str(citation["_id"])
-        citation["ID"]=citation["_id"]        
+        citation["_id"]=str(citation["_id"])                            
+        citation["ID"]=citation["_id"]                                                      # bibtex parser library requies ID field
         citation.pop("_id")        
         citations.append(citation)    
     return citations
 
 def get_project_preamable_list(project_id):    
+    """ 
+    Arguments : 
+        - project_id : Type(str)
+    Return : 
+        - preamable_list : Type(list)
+    Description : 
+        - get all the preamable info and create a custom structured dictionary
+    """
     title,authorsList,abstract=get_project_preamable_list_info(project_id)    
     preamble_list = [
         {"name": "addbibresource", "value": "references.bib"},

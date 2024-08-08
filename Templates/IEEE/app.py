@@ -50,8 +50,8 @@ def IEEE(project_id):
     # input("fill document")
     fill_document(doc, content,templateName,project_id)
     # input("end full document")
-    doc.append(NoEscape(r'\bibliographystyle{plain}'))
-    doc.append(NoEscape(r'\bibliography{references}'))
+    # doc.append(NoEscape(r'\bibliographystyle{plain}'))
+    # doc.append(NoEscape(r'\bibliography{references}'))
 
     doc.generate_tex()
     print("creating for pdf for IEEE")
@@ -59,7 +59,7 @@ def IEEE(project_id):
     file_path=os.path.join(os.path.join("temp",str(project_id)),"IEEE")
     
     try:
-      doc.generate_pdf(file_path, clean_tex=False)
+      doc.generate_pdf(file_path, clean_tex=False, compiler_args=['-shell-escape'])
       
     except Exception as e:
        print(e)

@@ -21,6 +21,10 @@
             ]
         },
         {
+            "name": "svg",
+            "options": []
+        },
+        {
             "name": "float",
             "options": []
         },

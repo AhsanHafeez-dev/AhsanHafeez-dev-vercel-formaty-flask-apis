@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}%
 \usepackage{lastpage}%
 \usepackage{cite}%
+\usepackage{svg}%
 \usepackage{float}%
 \usepackage{graphicx}%
 \usepackage{xurl}%
@@ -39,14 +40,31 @@ AI, JavaScript, TypeScript%
 Updated Lorem ipsum dolor sit amet...
     \begin{figure}[htbp] 
     \centerline{\includegraphics[width=\linewidth]{image_1.png}}
-    \caption{"greek" for="" greeks=""}
+    \caption{greekforgreeks}
     \label{fig:image_1.png}
+    \end{figure}
+
+    \begin{figure}[htbp] 
+    \centerline{\includegraphics[width=\linewidth]{image_2.png}}
+    \caption{samplepngimages}
+    \label{fig:image_2.png}
+    \end{figure}
+
+        \begin{figure}[htbp] 
+        \centering
+        \includesvg[width=\linewidth]{image_3.svg}
+        \caption{samplesvgimages}
+        \label{fig:image_3.svg}
+        \end{figure}
+
+    \begin{figure}[htbp] 
+    \centerline{\includegraphics[width=\linewidth]{image_4.jpeg}}
+    \caption{samplejpeg}
+    \label{fig:image_4.jpeg}
     \end{figure}%
 \subsection{Updated Subsection 1.1}%
 \label{subsec:UpdatedSubsection1.1}%
 Updated  Lorem ipsum dolor sit amet...
 
 %
-\bibliographystyle{plain}%
-\bibliography{references}%
 \end{document}
