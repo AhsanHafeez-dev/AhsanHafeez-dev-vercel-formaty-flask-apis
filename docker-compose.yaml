@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  latex_app:
+    image: blang/latex:ubuntu
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /usr/src/app
+    command: ["python3", "your_script.py"]
+    volumes:
+      - .:/usr/src/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - pip_install
+
+  pip_install:
+    image: blang/latex:ubuntu
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      sh -c "apt-get update && 
+      apt-get install -y python3-pip &&
+      pip3 install pylatex"
+    volumes:
+      - .:/usr/src/app
+    environment:
+      - PYTHONUNBUFFERED=1

@@ -9,7 +9,6 @@ Werkzeug
 flask-swagger-ui
 flasgger
 pymongo
-
 firebase-admin
 bs4
 
