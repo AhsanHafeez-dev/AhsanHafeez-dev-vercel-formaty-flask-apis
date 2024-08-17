@@ -1,21 +1,34 @@
-# Use the blang/latex image as the base image
-FROM blang/latex:ubuntu
+# Base image with Python
+FROM python:3.10-slim
 
-# Install pip
-RUN apt-get update && \
-    apt-get install -y python3-pip
+# Install dependencies required for TeX Live and other system tools
+RUN apt-get update && apt-get install -y \
+    texlive-full \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Python packages
-RUN pip3 install pylatex
+# Set the working directory in the container
+WORKDIR /app
 
-# Set the working directory
-WORKDIR /usr/src/app
+# Copy the requirements file into the container
+COPY requirements.txt .
 
-# Copy the application code
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of your application code
 COPY . .
 
-# Set the entry point for the container
-CMD ["python3", "your_script.py"]
+# Expose the port that Flask will run on
+EXPOSE 5000
+
+# Set the environment variable for Flask
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+
+# Command to run the Flask application
+CMD ["flask", "run"]
+
 
 
 
@@ -73,7 +86,7 @@ CMD ["python3", "your_script.py"]
 #     echo "deb http://miktex.org/download/ubuntu bionic universe" | tee /etc/apt/sources.list.d/miktex.list
 
 # # Update package lists and install MiKTeX
-# # RUN apt-get install miktex 
+# # RUN apt-get insxiktex 
 
 # # Set the working directory in the container
 # WORKDIR /app

@@ -3,6 +3,7 @@ from flask import jsonify
 from app import app
 from bson import  ObjectId
 import os
+from Templates.IEEEJournal.hardcoded import appenddices
 # app.config["MONGO_URI"]="mongodb+srv://ahsan:Hamza3755@templates.xrcj1en.mongodb.net/testing?retryWrites=true&w=majority&appName=templates"
 app.config["MONGO_URI"]="mongodb+srv://mbabarwaseem:579DFHzEn9dnrU3T@formatify-cluster.dvqcc9n.mongodb.net/test?retryWrites=true&w=majority&appName=formatify-cluster"
 
@@ -83,7 +84,7 @@ def get_template_info(template_name,project_id):
         "lmodern"           :info [ "lmodern" ]         ,
         "textcomp"          :info [ "textcomp" ]
     }
-    
+    input(doc_config["default_filepath"])
     packages=info["packages"]
     return [doc_config,packages]
 
@@ -187,3 +188,6 @@ def get_key_words(lst):
 
 def get_tenplate_name(project_id):
     return db.projects.find_one({"_id":project_id})["templateName"]
+
+def get_appendices(project_id):
+    return appenddices

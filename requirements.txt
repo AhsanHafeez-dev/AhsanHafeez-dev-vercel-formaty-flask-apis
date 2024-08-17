@@ -11,7 +11,7 @@ flasgger
 pymongo
 firebase-admin
 bs4
-
+imghdr
 
 
 

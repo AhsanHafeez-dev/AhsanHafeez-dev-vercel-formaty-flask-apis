@@ -14,8 +14,8 @@ def IEEE(project_id):
     templateName="IEEE"
     # input("getting template info")
     doc_config,packages =  db.get_template_info(templateName,project_id)
-    # input("initiazlizing document")
-    doc = Document(**doc_config)
+    geometry_options = {"tmargin": "1in", "lmargin": "1in"}
+    doc = Document(documentclass='IEEEtran', document_options=['journal'], geometry_options=geometry_options)
     # input("adding rw preamable")
     add_raw_preamble(doc, raw_preamble_list)
     # input("add packages")
@@ -24,6 +24,7 @@ def IEEE(project_id):
     title,authorsList,abstract = db.get_project_preamable_list_info(project_id)
     
     download_all_images(project_id)
+    print("all images downloaded")
     # input("getting content")
     content=db.get_project_content(project_id)
     # input("title template")
@@ -50,16 +51,16 @@ def IEEE(project_id):
     # input("fill document")
     fill_document(doc, content,templateName,project_id)
     # input("end full document")
-    # doc.append(NoEscape(r'\bibliographystyle{plain}'))
-    # doc.append(NoEscape(r'\bibliography{references}'))
+    doc.append(NoEscape(r'\bibliographystyle{plain}'))
+    doc.append(NoEscape(r'\bibliography{references}'))
 
     doc.generate_tex()
     print("creating for pdf for IEEE")
     # input("going for  pdf")
-    file_path=os.path.join(os.path.join("temp",str(project_id)),"IEEE")
+    file_path=os.path.join(os.path.join("temp",str(project_id)),"IEEEJournal")
     
     try:
-      doc.generate_pdf(file_path, clean_tex=False, compiler_args=['-shell-escape'])
+      doc.generate_pdf(file_path, clean_tex=False)
       
     except Exception as e:
        print(e)

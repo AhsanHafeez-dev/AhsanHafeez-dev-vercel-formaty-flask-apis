@@ -121,7 +121,8 @@ responses:
     # list of all templates to be inserted
 
 
-    jsons=["IEEE.json","APA7.json"]
+    # jsons=["IEEE.json","APA7.json"]
+    jsons=["IEEEJournal.json"]
 
     template=None
     
@@ -202,8 +203,9 @@ def get_template():
           
             try:
                 shutil.rmtree(dump_folder)                
+                print("deleted folder")
             except Exception as e:
-                input("folder doesnot exits before")  
+                print("folder doesnot exits before")  
             # input(dump_folder)
             os.makedirs(dump_folder)
             # db.add_sample_citations()

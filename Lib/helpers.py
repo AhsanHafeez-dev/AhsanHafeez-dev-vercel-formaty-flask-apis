@@ -2,6 +2,7 @@ import json
 import os
 import re
 import shutil
+import imghdr
 from urllib.request import urlretrieve
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
@@ -39,32 +40,32 @@ def parse_content(doc,text,templateName,project_id):
     
     
     
-    input("in parse content")
-    # input("0")
-    # input(text)
+    ## input("in parse content")
+    ## input("0")
+    ## input(text)
     text=add_tables(doc,text,templateName)      
-    # input("1")
-    # input(text)                                                                                    # convert html table to latex tables            
+   # input("1")
+    ## input(text)                                                                                    # convert html table to latex tables            
     text = text.replace("<b>", "\\textbf{").replace("</b>", "}")                                     # replace b tag with \textbf(bold in latex)
-    # input("2")
-    # input(text)
-    text=re.sub(r"(.*?)<sup>(.*?)</sup>",r"\1^{\2}",text)                                            # replace supSript tag wih ^ in latex (raise to or power)    
-    # input("3")
-    # input(text)
-    text=re.sub(r"(.*?)<sub>(.*?)</sub>",r"\1_{\2}",text)                                            # replace SubScrpit tag with _ sub scrpit in latex
+   # input("2")
+    
+    # text=re.sub(r"(.*?)<sup>(.*?)</sup>",r"\1^{\2}",text)                                            # replace supSript tag wih ^ in latex (raise to or power)    
+   # input("3")
+    ## input(text)
+    # text=re.sub(r"(.*?)<sub>(.*?)</sub>",r"\1_{\2}",text)                                            # replace SubScrpit tag with _ sub scrpit in latex
     
     text = text.replace("<i>", "\\textit{").replace("</i>", "}")   
                                     #replacing <i> with texttit (italic in latex)
     text = text.replace("<ul>", "\\begin{itemize}").replace("</ul>", "\\end{itemize}")    
     text = text.replace("<ol>", "\\begin{enumerate}").replace("</ol>", "\\end{enumerate}")           # Handle orded lits
     text = text.replace("<li>", "\\item ").replace("</li>", "")                                      # Handle list items
-    # input(text)
+    ## input(text)
     text = re.sub(r"<p>(.*?)</p>", r"\1\n\n", text)                                                  # handling paragraph by replacing p tag with new line
     text = re.sub(r"<h.*?>(.*?)</h.*?>", r"\\textbf{\1}\n\n", text)                                  # handling heading in html by \textbf in latex
-    # input(text)
+    ## input(text)
     citation_ids=re.findall(r"<cite>(.*?)</cite>",text,re.DOTALL )                                   # getting all citation from database    
     if len(citation_ids)>0:                                                                          # if there is any citation
-        # print("calling biblography")
+        print("calling biblography")
         create_biblography_file(citation_ids,project_id)                                             # creating a biblography file 
             # Replace citation IDs with titles
     for citation_id in citation_ids:                                                        
@@ -77,14 +78,21 @@ def parse_content(doc,text,templateName,project_id):
 
     # Handle images
     print("going for imags")
-    # input(text)
-    # input(re.findall(r'<img .*? />',text,re.DOTALL))
-
-    text = re.sub(r'<img alt=(.*?) src=(.*?)>'
-    , replace_img_tag, text)
+    ## input(text)
+    ## input(re.findall(r'<img .*? />',text,re.DOTALL))
+    
+    if templateName=="IEEEJournal":
+        print("same")
+        text = re.sub(r'<img alt=(.*?) src=(.*?)>'
+        , replace_img_tag_journal, text)
+    
+    else:
+        print("different ",templateName)
+        text = re.sub(r'<img alt=(.*?) src=(.*?)>'
+        , replace_img_tag, text)
 
     
-    # input("done with images")
+   # input("done with images")
     # print("images")
     # print(re.findall(r"\\begin{figure}",txt,re.DOTALL))
     # print(text)    
@@ -92,7 +100,7 @@ def parse_content(doc,text,templateName,project_id):
 
 def add_tables(doc,html_content,templateName):
     """
-    Input : 
+   # Input : 
         - html_content : Type(str)
         - templateName : Type(str)
     Return : 
@@ -128,6 +136,8 @@ def add_tables(doc,html_content,templateName):
                 
         if "APA" in templateName:                                                                       # in apa7 we dont have vertical lines
             tabular_defination,max_columns=get_tabular_defination_APA(raw_table)
+        elif templateName=="IEEEJournal":
+            tabular_defination,max_columns=get_tabular_defination_journal(raw_table)
         else:
             tabular_defination,max_columns = get_tabular_defination(raw_table)                  
 
@@ -138,14 +148,14 @@ def add_tables(doc,html_content,templateName):
         
         for i in range(len(patterns)):  
             raw_table = re.sub(patterns[i], replace_with_list[i], raw_table)                            # replace every html pattern with latex syntax
-            # input(raw_table)
-        input(raw_table)
+            ## input(raw_table)
+       # input(raw_table)
         raw_table=handle_multi_row(raw_table,max_columns)        
-        input(raw_table)
+       # input(raw_table)
         
         html_content=html_content.replace(table,raw_table)
                 # but still html
-    # input(html_content)        
+    ## input(html_content)        
     return html_content
 
 
@@ -195,9 +205,9 @@ def add_raw_preamble(doc, raw_preamble_list):
     doc.preamble.append(NoEscape(raw_preamble))
 
 
-def fill_document(doc, data,templateName,project_id):
+def fill_document(doc, data,templateName,project_id,capitalize):
     """ 
-    Input : 
+   # Input : 
         - doc            : Type(str)
         - data           : Type(str)
         - templateName   : Type(str)
@@ -212,24 +222,32 @@ def fill_document(doc, data,templateName,project_id):
     
     
             
-    for section in data["included"]:
+    for i,section in enumerate(data["included"]):
         with doc.create(Section(section["title"])):
             print("Sections")
-            input(section['content'])
-            content=parse_content(doc,section["content"],templateName,project_id)
+            journal="IEEEJournal"
+            if templateName==journal and i==0 and capitalize:
+                T,his=section["content"].split()[0][0],section["content"].split()[0][1:]            
+            
+            content=parse_content(doc,section["content"],templateName,project_id)            
+            
+            if templateName==journal and capitalize:
+                doc.append(NoEscape(f"\\IEEEPARstart{{{T}}}{{{his}}}"))
             doc.append(content)
-
+            print("section complete")
             for subsection in section.get("subSections", []):
                 with doc.create(Subsection(subsection["title"])):
                     doc.append(parse_content(doc,subsection["content"],templateName,project_id))
+                    print("subsection complete")
 
 
                     for subsubsection in subsection.get("subSubSections", []):
                         with doc.create(Subsubsection(subsubsection["title"])):
                             doc.append(parse_content(doc,subsubsection["content"],templateName,project_id))
+                            print("subsubsection complete")
                 
-    
-    
+
+
 
 def generate_author_block(authors):
 
@@ -237,15 +255,15 @@ def generate_author_block(authors):
     author_block = r'\author{'
     for i, author in enumerate(authors):
         if author['userName']=='':
-            author['userName']="please enter User Name"
+            author['userName']="Anoymonous User"
         if author['department']=='':
-            author['department']="please enter department Name"
+            author['department']="Unknown Department"
         if author['university']=='':
-            author['university']="please enter university Name"
+            author['university']="Unknown University"
         if author['city']=='':
-            author['city']="please enter city Name"        
+            author['city']="Unknown City"        
         if author['email']:
-            author['email']="please enter email"
+            author['email']="unknown@gmail.com"
         author_block += r'\IEEEauthorblockN{' + str(i+1) + '. ' + author['userName'] + r'}' + '\n'
         author_block += r'\IEEEauthorblockA{\textit{' + author['department'] + r'} \\' + '\n'
         author_block += r'\textit{' + author['university'] + r'}\\' + '\n'
@@ -256,7 +274,41 @@ def generate_author_block(authors):
     author_block += r'}'
     return NoEscape(author_block)
 
+def generate_author_block_journal(authors, thanks):
+    """
+    Generate the author block for an IEEE journal paper.
 
+    Parameters:
+    authors (list of dict): List of dictionaries where each dictionary contains
+                            'userName', 'department', 'university', 'city', 'email'.
+    thanks (str): Text to be included in the \thanks block.
+
+    Returns:
+    NoEscape: LaTeX code for the author block.
+    """
+    
+    author_block = r'\author{'
+    
+    for i, author in enumerate(authors):
+        # Default values if any field is empty
+        userName = author.get('userName', 'Anonymous User') or 'Anonymous User'
+        department = author.get('department', 'Unknown Department') or 'Unknown Department'
+        university = author.get('university', 'Unknown University') or 'Unknown University'
+        city = author.get('city', 'Unknown City') or 'Unknown City'
+        email = author.get('email', 'unknown@gmail.com') or 'unknown@gmail.com'
+        
+        # Build author block
+        author_block +=   userName + ',' + '\n'
+        
+        if i < len(authors) - 1:
+            author_block += r'\and' +  r'\IEEEmembership{student,~'+university+ '}' +  '\n'
+    
+    # Add \thanks block at the end of the author block
+    
+    author_block += r'\thanks{' + thanks + r'}'
+    author_block += r'}'
+    
+    return NoEscape(author_block)
 def create_biblography_file(citation_id_list,project_id=""):       
             # print("biblography")
     
@@ -279,7 +331,7 @@ def create_biblography_file(citation_id_list,project_id=""):
         
 def get_pattern_list():
         """ 
-    Input : 
+   # Input : 
         - None
     Output : 
         - rpattern : Type(list)
@@ -308,7 +360,7 @@ def get_pattern_list():
         return patterns
 def get_replace_with_list(tabular_defination):
     """ 
-    Input : 
+   # Input : 
         - tabular_defination : Type(str)
     Output : 
         - replace_with_list : Type(list)
@@ -333,7 +385,7 @@ def get_replace_with_list(tabular_defination):
     return replace_with_list
 def get_tabular_defination(table):
         """ 
-        Input : 
+       # Input : 
             - table : Type(str)
         Description : 
             - takes html table and create latex table defination from it e.g |c|c|c|
@@ -351,10 +403,32 @@ def get_tabular_defination(table):
         get_tabular_defination_APA(table)
         return [tabular_defination,max_columns]
 
+
+def get_tabular_defination_journal(table):
+        """ 
+       # Input : 
+            - table : Type(str)
+        Description : 
+            - takes html table and create latex table defination from it e.g |c|c|c|
+            
+        Return :
+            - tabular_defination : Type(str)
+        """
+        rows = re.findall(r"<tr>(.*?)</tr>", table, re.DOTALL)
+                                                                                        # finding maximum number of columns  for use in tabular defination i.e {c|c|}
+        max_columns = max((sum(1 for _ in re.finditer(r"<td.*?>", row)) for row in rows), default=0)
+        
+                                                                                        # setting latex syntax regading how many columns will be in column
+        tabular_defination = '||'.join('c' * max_columns)
+        tabular_defination = f"|{tabular_defination}|"
+        get_tabular_defination_APA(table)
+        return [tabular_defination,max_columns]
+
+
 def get_tabular_defination_APA(table):
         
         """ 
-        Input : 
+       # Input : 
             - table : Type(str)
         Description : 
             - takes html table and create latex table defination from it e.g |c|c|c|
@@ -376,7 +450,7 @@ def get_tabular_defination_APA(table):
 
 def handle_multi_row(table,max_columns):
         """      
-        Input : 
+       # Input : 
             - table         : Type(str)
             - max_colums    : Type(str)
         Description :
@@ -404,55 +478,60 @@ def handle_multi_row(table,max_columns):
 
 def download_all_images(project_id):
     """ 
-    Input : 
+   # Input : 
         - project_id : Type(str)
-    fetch the image list from database based on project id and install the images
+    Fetch the image list from the database based on project id and install the images
     """
     
-    img_url_lst=db.get_project_images(project_id)
-    # img_url_lst=["https://media.geeksforgeeks.org/wp-content/uploads/20210224040124/JSBinCollaborativeJavaScriptDebugging6-300x160.png" ]
-    i=1
-    
+    img_url_lst = db.get_project_images(project_id)
+    i = 1
+    # img_url_lst.pop(3)
     for image_url in img_url_lst:
+        if(i==5):
+            print("starting to download base 64 image")
         parsed_url = urlparse(image_url)
         path = parsed_url.path
+        
+        
         file_ext = os.path.splitext(path)[-1].lower()
         if not file_ext:
             file_ext=".jpeg"
-            
-
-        filename=f'image_{str(i)}{file_ext}'
         
-        path=os.path.join(os.path.join("temp",str(project_id)),filename  )
+        temp_path = os.path.join("temp",str(project_id), f"image_{i}{file_ext}")
+        # print("going for downloaf")
+        urlretrieve(image_url, temp_path)
+        # print("end download")
         
-        url_mapping[image_url]=filename
         
-        urlretrieve(image_url, path)
-        i+=1
-    
+        # Map the URL to the filename
+        url_mapping[image_url] = f"image_{i}{file_ext}"
+        
+        i += 1
+        # print(i)
 
 def get_image_name(url):
     """ 
-    Input:
+   # Input:
         - url  : Type(str) 
     Description:
         -map name to url
     """
     # print("getting image name")
-    # input(url)
-    # input("seee url")
+    ## input(url)
+    ## input("seee url")
     return url_mapping[url]  
 def replace_img_tag(match):
     """ 
-    Input :
+   # Input :
         - match  re.compile
     Description:
         - latex code for showing image
     """
-    input("match")
+    ## input("match")
+    print("conference")
     url = match.group(2).strip('"/"')
     alt = match.group(1).strip('"')  
-    # input(url_mapping)
+    ## input(url_mapping)
     image_name = get_image_name(url)
     figure="figure"
     width="375pt"
@@ -471,6 +550,31 @@ def replace_img_tag(match):
 
     return f'''
     \\begin{{{figure}}}[htbp] 
+    \\centerline{{\\includegraphics[width=\\linewidth]{{{image_name}}}}}
+    \\caption{{{alt}}}
+    \\label{{fig:{image_name}}}
+    \\end{{{figure}}}'''    
+
+def replace_img_tag_journal(match):
+    """ 
+   # Input :
+        - match  re.compile
+    Description:
+        - latex code for showing image
+    """
+    ## input("match")
+    print("journal")
+    url = match.group(2).strip('"/"')
+    alt = match.group(1).strip('"')  
+    ## input(url_mapping)
+    image_name = get_image_name(url)
+    figure="figure"
+    width="375pt"
+    height="375pt"
+    
+
+    return f'''
+    \\begin{{{figure}}}[!t] 
     \\centerline{{\\includegraphics[width=\\linewidth]{{{image_name}}}}}
     \\caption{{{alt}}}
     \\label{{fig:{image_name}}}

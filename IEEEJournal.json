@@ -1,0 +1,101 @@
+{
+    "templateName": "IEEEJournal",
+    "documentclass": "IEEEtran",
+    "document_options": [
+        "journal",
+        "lettersize"
+    ],
+    "fontenc": null,
+    "inputenc": null,
+    "lmodern": false,
+    "textcomp": false,
+    "rawPreamables": [
+        "r'\\IEEEoverridecommandlockouts'" ,
+        "r'\\hyphenation{op-tical net-works semi-conduc-tor}'",
+        "r'\\markboth{Journal of \\LaTeX\\ Class Files,~Vol.~14, No.~8, August~2015}'"
+
+    ],
+    "packages": [
+        {
+            "name": "cite",
+            "options": []
+        },
+        {
+            "name": "subfig",
+            "options": ["caption=false","font=normalsize","labelfont=sf","textfont=sf"]
+        },
+
+        {
+            "name": "textcomp",
+            "options": [
+            ]
+        },
+
+        {
+            "name": "stfloats",
+            "options": [
+            ]
+        },
+
+        {
+            "name": "url",
+            "options": [
+            ]
+        },
+
+        {
+            "name": "verbatim",
+            "options": []
+        },
+
+        {
+            "name": "graphicx",
+            "options": []
+        },
+
+
+        {
+            "name": "hhline",
+            "options": []
+        },
+        {
+            "name": "multirow",
+            "options": []
+        },
+        {
+            "name": "amsmath",
+            "options": []
+        },
+        {
+            "name": "amssymb",
+            "options": []
+        },
+        {
+            "name": "amsfonts",
+            "options": []
+        },
+        {
+            "name": "algorithmic",
+            "options": []
+        },
+        
+        {
+            "name": "textcomp",
+            "options": []
+        },
+        {
+            "name": "xcolor",
+            "options": []
+        }
+    ],
+    "keywords": [
+        "phd thesis",
+        "conferences",
+        "book",
+        "documentary"
+    ],
+    "description": "The IEEE (Institute of Electrical and Electronics Engineers) citation style is widely used in technical fields, especially in computer science and engineering. It is a numbered reference style that provides a consistent way to cite sources",
+    "publisher": "IEEE",
+    "format": "IEEE",
+    "type": "IEEE"
+}
