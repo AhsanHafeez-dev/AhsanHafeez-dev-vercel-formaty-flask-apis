@@ -203,7 +203,9 @@ def add_biblography():
             return f'File successfully uploaded to database'
     return "not a pdfs"
 
-
+@app.route("/")
+def home():
+    return "welcome to formaty vercel apis"
 
 if __name__=='__main__':
     app.run(debug=True)
