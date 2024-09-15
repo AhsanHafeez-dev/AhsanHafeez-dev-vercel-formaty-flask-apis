@@ -1,10 +1,9 @@
-pdf2bib
 Flask
 Flask-RESTful
 Werkzeug==2.0.3
 pymongo
 flask_pymongo
-
+pdf2bib
 
 
 
