@@ -1,0 +1,85 @@
+{
+    "templateName": "ACMConference",
+    "documentclass": "acmart",
+    "document_options": [
+        
+        "sigconf",
+        "authordraft"
+    ],
+    "fontenc": null,
+    "inputenc": null,
+    "lmodern": false,
+    "textcomp": false,
+    "rawPreamables": [
+        "r'\\IEEEoverridecommandlockouts'"
+    ],
+    "packages": [
+        {
+            "name": "cite",
+            "options": []
+        },
+
+        {
+            "name": "float",
+            "options": []
+        },
+        
+        {
+            "name": "graphicx",
+            "options": []
+        },
+        {
+            "name": "xurl",
+            "options": []
+        },
+        {
+            "name": "hhline",
+            "options": []
+        },
+        {
+            "name": "multirow",
+            "options": []
+        },
+        {
+            "name": "amsmath",
+            "options": []
+        },
+        {
+            "name": "amssymb",
+            "options": []
+        },
+        {
+            "name": "amsfonts",
+            "options": []
+        },
+        {
+            "name": "graphicx",
+            "options": []
+        }
+        
+    ],
+    "keywords": [
+        "phd thesis",
+        "conferences",
+        "book",
+        "documentary"
+    ],
+    "description": "The IEEE (Institute of Electrical and Electronics Engineers) citation style is widely used in technical fields, especially in computer science and engineering. It is a numbered reference style that provides a consistent way to cite sources",
+    "publisher": "IEEE",
+    "format": "IEEE",
+    "type": "IEEE"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

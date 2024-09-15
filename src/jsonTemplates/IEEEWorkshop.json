@@ -1,0 +1,122 @@
+{
+    "templateName": "IEEEWorkshop",
+    "documentclass": "IEEEtran",
+    "document_options": [
+        "conference"
+    ],
+    "fontenc": null,
+    "inputenc": null,
+    "lmodern": false,
+    "textcomp": false,
+    "rawPreamables": [
+        "r'\\IEEEoverridecommandlockouts'"
+    ],
+    "packages": [
+        {
+            "name": "cite",
+            "options": []
+        },
+        {
+            "name": "svg",
+            "options": []
+        },
+        {
+            "name": "float",
+            "options": []
+        },
+        {
+            "name": "lastpage",
+            "options": []
+        },
+        {
+            "name": "listings",
+            "options": []
+        },
+        {
+            "name": "exscale",
+            "options": []
+        },
+        {
+            "name": "blindtext",
+            "options": []
+        },
+        {
+            "name": "verbatim",
+            "options": []
+        },
+        {
+            "name": "algpseudocode",
+            "options": []
+        },
+        {
+            "name": "fancyvrb",
+            "options": []
+        }, 
+        {
+            "name": "bera",
+            "options": []
+        },
+        {
+            "name": "mathtools",
+            "options": []
+        },
+        {
+            "name": "lipsum",
+            "options": []
+        },
+        {
+            "name": "graphicx",
+            "options": []
+        },
+        {
+            "name": "xurl",
+            "options": []
+        },
+        {
+            "name": "hhline",
+            "options": []
+        },
+        {
+            "name": "multirow",
+            "options": []
+        },
+        {
+            "name": "amsmath",
+            "options": []
+        },
+        {
+            "name": "amssymb",
+            "options": []
+        },
+        {
+            "name": "amsfonts",
+            "options": []
+        },
+        {
+            "name": "algorithmic",
+            "options": []
+        },
+        {
+            "name": "graphicx",
+            "options": []
+        },
+        {
+            "name": "textcomp",
+            "options": []
+        },
+        {
+            "name": "xcolor",
+            "options": []
+        }
+    ],
+    "keywords": [
+        "phd thesis",
+        "conferences",
+        "book",
+        "documentary"
+    ],
+    "description": "The IEEE (Institute of Electrical and Electronics Engineers) citation style is widely used in technical fields, especially in computer science and engineering. It is a numbered reference style that provides a consistent way to cite sources",
+    "publisher": "sans",
+    "format": "IEEE",
+    "type": "Workshop"
+}

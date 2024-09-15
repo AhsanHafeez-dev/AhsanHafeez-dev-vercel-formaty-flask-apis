@@ -1,19 +1,26 @@
-from flask import Flask, request, jsonify,send_file
-from flasgger import Swagger
-from bson import  ObjectId
-import importlib
-import json
+
 import os
-import shutil 
-
+import shutil
+from flasgger import Swagger
+from flask import request,jsonify,Flask,Response
 app = Flask(__name__)
+from flask_pymongo import PyMongo
 import database as db
-
-
+app.config["MONGO_URI"]="mongodb+srv://mbabarwaseem:579DFHzEn9dnrU3T@formatify-cluster.dvqcc9n.mongodb.net/test?retryWrites=true&w=majority&appName=formatify-cluster"
+import pdf2bib
+pdf2bib.config.set('verbose',False)
+app.config['UPLOAD_FOLDER']='temp'
+import bibtexparser
+from werkzeug.utils import secure_filename
 
 Swagger(app)
 
-@app.route("/templates", methods=["POST"])
+
+def get_bibtex_from_pdf(path):
+    result=pdf2bib.pdf2bib(path)
+    return result['bibtex']
+
+@app.route("/templates",methods=['POST'])
 def homePost():
     """
 ---
@@ -65,7 +72,7 @@ parameters:
           type: array
           items:
             type: string
-          example: ["r'\\\IEEEoverridecommandlockouts'"]
+          example: ["r'\\IEEEoverridecommandlockouts'"]
           description: Raw LaTeX commands to be included in the preamble
         packages:
           type: array
@@ -111,36 +118,37 @@ responses:
     description: Invalid input data
 """
 
-    # template=request.get_json()
-    # if template is not None:
-    #         db.save_to_database(template)
-
-
-
-
     # list of all templates to be inserted
 
 
     # jsons=["IEEE.json","APA7.json"]
-    jsons=["IEEEJournal.json"]
+    # jsons=[os.path.join(r"jsonTemplates","ACMConference")]
 
-    template=None
+    # template=None
     
     
-    for file in jsons:
-        with open(file,"r") as json_file:
-            template=json.load(json_file)
+    # for file in jsons:
+    #     with open(file,"r") as json_file:
+    #         template=json.load(json_file)
 
-        # if template is not available already insert it    
-        if template is not None:
-            db.save_to_database(template)
+    #     # if template is not available already insert it    
+    #     if template is not None:
+    #         db.save_to_database(template)
             
 
 
-        template=None
-
-    return "Successfully inserted templates "
-
+    #     template=None
+    template=request.get_json()
+    if template is None:
+            data={"message":"there's nothing to insert"}
+    else:
+         db.save_to_database(template)
+         data={"message":"Successfully inserted templates "}
+        
+    
+    return jsonify(data), 200
+    
+    
 
 
 @app.route("/templates",methods=["GET"])
@@ -158,74 +166,44 @@ def getAll():
     return db.get_all_documents()
 
 
-@app.route("/create-paper", methods=["GET"])
-def get_template():    
 
-    """
-    Create a  LaTeX document and return the pdf after compiling porject
-    ---
-    tags:
-      - Paper Creation
-    parameters:
-      - in: query
-        name: project_id
-        type: string
-        required: true
-        description: The project ID to be processed.
-        example: 60c72b2f9af1f145d4b7a123
-    responses:
-      200:
-        description: templateName.pdf 
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-              description: The PDF file created from the project
-      400:
-        description: Bad request
-        schema:
-          type: object
-          properties:
-            error:
-              type: string
-              description: Error message explaining what went wrong
-              example: templateName not provided
-"""
-
+@app.route("/add-biblography",methods=["post"])
+def add_biblography():
     
-    project_id=ObjectId(request.args.get("project_id")) 
-    template_name=db.get_tenplate_name(project_id)
-    
-    if template_name:
-        try:
-            dump_folder=os.path.join("temp",str(project_id))
+    # project_id=request.form.get('project_id')
+    project_id="7583749385933957439"
+    dump_folder=os.path.join("temp",str(project_id))
           
-            try:
-                shutil.rmtree(dump_folder)                
-                print("deleted folder")
-            except Exception as e:
-                print("folder doesnot exits before")  
-            # input(dump_folder)
-            os.makedirs(dump_folder)
-            # db.add_sample_citations()
-            # input("added sample citation to database")
-            # input("in")       
-            module = importlib.import_module(f"Templates.{template_name}.app")        
-            # print("module imported")
-            template_func = getattr(module, template_name)
-            # print("function imported")
-            response = template_func(project_id)          
-            
-            
-            
-            return send_file(response[0],as_attachment=True,download_name=response[1])
-        
-        except (ModuleNotFoundError, AttributeError) as e:
-            return jsonify({"error": str(e)}), 400
+    if os.path.exists(dump_folder):
+        shutil.rmtree(dump_folder)                
+        print("deleted folder")
     else:
-        return jsonify({"error": "templateName not provided"}), 400
+        print("folder doesnot exits before")  
+    os.makedirs(dump_folder)
+    file=request.files['file']
 
-if __name__ == "__main__":
+    if file.mimetype == 'application/pdf':
+        if file.filename =='':
+            return 'no files send'
+        if file:
+            print("got file")
+            filename=secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], project_id,filename)
+            file.save(file_path)
+
+            bibtex_str=get_bibtex_from_pdf(file_path)
+            # Parse the BibTeX content
+            bib_database = bibtexparser.loads(bibtex_str)
+            
+            # Convert the BibTeX database to JSON
+            bib_jsons = [entry for entry in bib_database.entries]
+            id='3455fr65660'
+            # id=db.add_bibtex_citations(bib_jsons[0])
+            return id
+            return f'File successfully uploaded to database'
+    return "not a pdfs"
+
+
+
+if __name__=='__main__':
     app.run(debug=True)
-
